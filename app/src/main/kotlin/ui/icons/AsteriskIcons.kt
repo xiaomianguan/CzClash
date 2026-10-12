@@ -28,7 +28,7 @@ internal object AsteriskIcons {
         @DrawableRes val Edit = SmartisanR.drawable.setting_item_icon_pencil
         @DrawableRes val EditNote = SmartisanR.drawable.setting_item_icon_pencil
         @DrawableRes val MoreVert = SmartisanR.drawable.btn_more_selector
-        @DrawableRes val Search = SmartisanR.drawable.search_btn_selector
+        @DrawableRes val Search = SmartisanR.drawable.btn_search_selector
         @DrawableRes val Refresh = SmartisanR.drawable.tool_refresh_selector
         @DrawableRes val Settings = SmartisanR.drawable.standard_icon_settings_selector
         @DrawableRes val Tune = SmartisanR.drawable.setting_item_icon_pencil
@@ -60,29 +60,30 @@ internal object AsteriskIcons {
         @DrawableRes val Block = SmartisanR.drawable.secletor_setting_item_icon_keyguard
         @DrawableRes val Bluetooth = SmartisanR.drawable.icon_nav_bluetooth
         @DrawableRes val Wifi = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val CellTower = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val Dns = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val Http = SmartisanR.drawable.secletor_setting_item_icon_application
+        @DrawableRes val CellTower = SmartisanR.drawable.secletor_setting_item_icon_notification
+        @DrawableRes val Dns = SmartisanR.drawable.selector_setting_item_navbar
+        @DrawableRes val Map = SmartisanR.drawable.secletor_setting_item_icon_wallpaper
+        @DrawableRes val Http = SmartisanR.drawable.selector_setting_item_navbar
         @DrawableRes val Lan = SmartisanR.drawable.secletor_setting_item_icon_application
         @DrawableRes val Router = SmartisanR.drawable.secletor_setting_item_icon_application
         @DrawableRes val Route = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val SettingsEthernet = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val SettingsInputComponent = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val Cable = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val Usb = SmartisanR.drawable.secletor_setting_item_icon_application
+        @DrawableRes val SettingsEthernet = SmartisanR.drawable.secletor_setting_item_icon_shortcut
+        @DrawableRes val SettingsInputComponent = SmartisanR.drawable.selector_setting_item_navbar
+        @DrawableRes val Cable = SmartisanR.drawable.secletor_setting_item_icon_shortcut
+        @DrawableRes val Usb = SmartisanR.drawable.secletor_setting_item_icon_shortcut
         @DrawableRes val AccountTree = SmartisanR.drawable.secletor_setting_item_icon_application
         @DrawableRes val Hub = SmartisanR.drawable.secletor_setting_item_icon_application
         @DrawableRes val Memory = SmartisanR.drawable.secletor_setting_item_icon_brightness
         @DrawableRes val Storage = SmartisanR.drawable.secletor_setting_item_icon_brightness
         @DrawableRes val Speed = SmartisanR.drawable.secletor_setting_item_icon_brightness
         @DrawableRes val Terminal = SmartisanR.drawable.secletor_setting_item_icon_application
-        @DrawableRes val Code = SmartisanR.drawable.secletor_setting_item_icon_application
+        @DrawableRes val Code = SmartisanR.drawable.setting_item_icon_pencil
         @DrawableRes val DataObject = SmartisanR.drawable.secletor_setting_item_icon_application
         @DrawableRes val DataUsage = SmartisanR.drawable.secletor_setting_item_icon_shortcut
         @DrawableRes val Policy = SmartisanR.drawable.secletor_setting_item_icon_keyguard
         @DrawableRes val Security = SmartisanR.drawable.secletor_setting_item_icon_keyguard
         @DrawableRes val VpnLock = SmartisanR.drawable.secletor_setting_item_icon_keyguard
-        @DrawableRes val Public = SmartisanR.drawable.selector_setting_item_tnt_assist
+        @DrawableRes val Public = SmartisanR.drawable.secletor_setting_item_icon_launcher
         @DrawableRes val TravelExplore = SmartisanR.drawable.selector_setting_item_tnt_assist
         @DrawableRes val MyLocation = SmartisanR.drawable.selector_setting_item_tnt_assist
         @DrawableRes val QrCodeScanner = SmartisanR.drawable.secletor_setting_item_icon_application
@@ -117,11 +118,15 @@ internal object AsteriskIcons {
         }
     }
 
-    /** Bottom tab-bar icons: monochrome original glyphs (selection shown by darker tint). */
+    /**
+     * Bottom tab-bar icons. Three come from the original Smartisan tab-bar family
+     * (`tabbar_*`); `Home` uses the launcher/house glyph from the same line-icon set.
+     * All are opaque so [AsteriskBottomBar] can tint them to the ROM's own grey pair.
+     */
     object Tab {
         @DrawableRes val Home = SmartisanR.drawable.secletor_setting_item_icon_launcher
-        @DrawableRes val Proxies = SmartisanR.drawable.nav_bottom_bar_icon_sync_selector
-        @DrawableRes val Profiles = SmartisanR.drawable.nav_bottom_bar_icon_add_selector
-        @DrawableRes val Settings = SmartisanR.drawable.nav_bottom_bar_icon_settings_selector
+        @DrawableRes val Proxies = SmartisanR.drawable.ic_all_notes_folder
+        @DrawableRes val Profiles = SmartisanR.drawable.tabbar_folder
+        @DrawableRes val Settings = SmartisanR.drawable.tabbar_setting
     }
 }

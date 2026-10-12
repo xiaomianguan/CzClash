@@ -3,6 +3,7 @@
 
 package features.mihomo
 
+import cc.wuersan008.smartisanx.ui.asset.SmartisanOriginalIcons
 import ui.components.AsteriskTitleBarButton
 import ui.components.AsteriskIcon
 import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
@@ -949,7 +950,10 @@ fun MihomoProfileListPage(
 
 @Composable
 private fun MihomoProfileListEmptyState() {
-    AsteriskEmptyState(title = stringResource(R.string.common_empty))
+    AsteriskEmptyState(
+        title = stringResource(R.string.common_empty),
+        iconRes = SmartisanOriginalIcons.EmptyFolder,
+    )
 }
 
 private data class MihomoProfileContentSignature(

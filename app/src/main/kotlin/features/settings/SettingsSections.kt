@@ -122,7 +122,7 @@ internal fun SettingsCoreSection(
             SwitchPreference(
                 title = stringResource(R.string.settings_geodata_mode),
                 accent = IconAccent.MaskBlue,
-                icon = Icons.Rounded.Public,
+                icon = Icons.Rounded.Map,
                 summary = stringResource(R.string.settings_geodata_mode_summary),
                 checked = enableGeodataMode,
                 onCheckedChange = onEnableGeodataModeChange,
@@ -160,7 +160,7 @@ internal fun SettingsCoreSection(
                 value = raw?.geodataMode?.value?.toString() ?: notConfigured,
                 source = fromYaml,
                 summary = raw?.geodataMode?.path ?: rawState.unavailableReason.orEmpty(),
-                icon = Icons.Rounded.Public,
+                icon = Icons.Rounded.Map,
             )
             SettingsReadOnlyRow(
                 title = stringResource(R.string.settings_geodata_loader),

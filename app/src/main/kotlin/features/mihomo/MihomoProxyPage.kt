@@ -3,6 +3,7 @@
 
 package features.mihomo
 
+import cc.wuersan008.smartisanx.ui.asset.SmartisanOriginalIcons
 import cc.wuersan008.smartisanx.ui.control.SmartisanTextButton
 import ui.components.AsteriskEmptyState
 import ui.components.AsteriskIcon
@@ -28,7 +29,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -472,62 +472,57 @@ fun MihomoProxyPage(
                         verticalArrangement = Arrangement.spacedBy(MihomoProxyNodeGridSpacing),
                         horizontalArrangement = Arrangement.spacedBy(MihomoProxyNodeGridSpacing),
                     ) {
-                        if (group == null) {
-                            item(
-                                key = "empty",
-                                span = { GridItemSpan(maxLineSpan) },
-                            ) {
-                                if (
-                                    loadingPresentation == MihomoProxyLoadingPresentation.Initial &&
-                                    hasUsableProfile
-                                ) {
-                                    MihomoProxyLoadingCard()
-                                } else if (hasProfiles) {
-                                    MihomoProxyEmptyCard()
-                                } else {
-                                    MihomoProxyNoConfigurationCard(
-                                        onAddConfiguration = {
-                                            mainDestinationState?.select(MainDestination.Configurations)
-                                                ?: navigator.push(Route.MihomoProfileList)
-                                        },
+                        items(
+                            items = pageNodes,
+                            key = { nodeId -> nodeId.toMihomoProxyLazyItemKey() },
+                        ) { nodeId ->
+                            val node = proxies.node(nodeId)
+                            if (group == null) return@items
+                            val selectionEnabled = isMihomoProxyGroupSelectable(group) && runtimeAvailable
+                            MihomoProxyNodeCard(
+                                modifier = Modifier
+                                    .animateItem(
+                                        fadeInSpec = AsteriskMotion.effects(),
+                                        placementSpec = AsteriskMotion.spatial(),
+                                        fadeOutSpec = AsteriskMotion.effects(),
                                     )
-                                }
-                            }
-                        } else if (pageNodes.isEmpty()) {
-                            item(
-                                key = "group_empty:${group.name}",
-                                span = { GridItemSpan(maxLineSpan) },
+                                    .fillMaxWidth(),
+                                node = node,
+                                selected = isMihomoProxyNodeCurrent(
+                                    group = group,
+                                    nodeName = node.name,
+                                    pendingSelections = pendingSelections,
+                                ),
+                                selectionEnabled = selectionEnabled,
+                                delayTestEnabled = runtimeAvailable && testingTarget == null,
+                                compact = columns > 1,
+                                testing = testingTarget == MihomoDelayTarget.Node(node.id),
+                                onSelect = { selectProxy(group, node) },
+                                onDelayTest = { testProxy(node) },
+                            )
+                        }
+                    }
+                    val groupEmpty = pageNodes.isEmpty()
+                    if (groupEmpty) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (
+                                group == null &&
+                                loadingPresentation == MihomoProxyLoadingPresentation.Initial &&
+                                hasUsableProfile
                             ) {
-                                MihomoProxyEmptyCard()
-                            }
-                        } else {
-                            items(
-                                items = pageNodes,
-                                key = { nodeId -> nodeId.toMihomoProxyLazyItemKey() },
-                            ) { nodeId ->
-                                val node = proxies.node(nodeId)
-                                val selectionEnabled = isMihomoProxyGroupSelectable(group) && runtimeAvailable
-                                MihomoProxyNodeCard(
-                                    modifier = Modifier
-                                        .animateItem(
-                                            fadeInSpec = AsteriskMotion.effects(),
-                                            placementSpec = AsteriskMotion.spatial(),
-                                            fadeOutSpec = AsteriskMotion.effects(),
-                                        )
-                                        .fillMaxWidth(),
-                                    node = node,
-                                    selected = isMihomoProxyNodeCurrent(
-                                        group = group,
-                                        nodeName = node.name,
-                                        pendingSelections = pendingSelections,
-                                    ),
-                                    selectionEnabled = selectionEnabled,
-                                    delayTestEnabled = runtimeAvailable && testingTarget == null,
-                                    compact = columns > 1,
-                                    testing = testingTarget == MihomoDelayTarget.Node(node.id),
-                                    onSelect = { selectProxy(group, node) },
-                                    onDelayTest = { testProxy(node) },
+                                MihomoProxyLoadingCard()
+                            } else if (group == null && !hasProfiles) {
+                                MihomoProxyNoConfigurationCard(
+                                    onAddConfiguration = {
+                                        mainDestinationState?.select(MainDestination.Configurations)
+                                            ?: navigator.push(Route.MihomoProfileList)
+                                    },
                                 )
+                            } else {
+                                MihomoProxyEmptyCard()
                             }
                         }
                     }
@@ -998,13 +993,9 @@ private fun ProtocolDelayLine(
 
 @Composable
 private fun MihomoProxyEmptyCard() {
-    SmartisanText(
-        text = stringResource(R.string.common_empty),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 16.dp),
-        textAlign = TextAlign.Center,
-        color = LocalSmartisanColors.current.textSecondary,
+    AsteriskEmptyState(
+        title = stringResource(R.string.common_empty),
+        iconRes = SmartisanOriginalIcons.EmptyFolder,
     )
 }
 
@@ -1016,6 +1007,7 @@ private fun MihomoProxyNoConfigurationCard(
         title = stringResource(R.string.mihomo_proxies_no_profile_title),
         description = stringResource(R.string.mihomo_proxies_no_profile_summary),
         modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+        iconRes = SmartisanOriginalIcons.EmptyFolder,
         action = {
             SmartisanTextButton(
                 text = stringResource(R.string.mihomo_profile_add),

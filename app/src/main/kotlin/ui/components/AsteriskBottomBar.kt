@@ -3,6 +3,10 @@
 
 package ui.components
 
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.foundation.Image
+import androidx.compose.animation.core.tween
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -16,12 +20,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
@@ -37,8 +43,16 @@ import cc.wuersan008.smartisanx.core.theme.SmartisanDimens
 import cc.wuersan008.smartisanx.core.utils.rememberSmartisanDrawablePainter
 import cc.wuersan008.smartisanx.core.utils.smartisanDrawableBackground
 import cc.wuersan008.smartisanx.ui.asset.SmartisanDrawables
-import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
 import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.isInDarkTheme
+
+/**
+ * Original system tab-bar grey pair, measured from the ROM's own tab glyphs
+ * (`icon_nav_*` normal `#B4B4B4` / pressed `#5C5C5C`): inactive tabs are light grey,
+ * the active tab is the darkened glyph.
+ */
+private val AsteriskBottomBarSelectedTint = Color(0xFF5C5C5C)
+private val AsteriskBottomBarUnselectedTint = Color(0xFFB4B4B4)
 
 /**
  * One tab in [AsteriskBottomBar].
@@ -126,17 +140,29 @@ private fun AsteriskBottomBarItemView(
     val interaction = rememberSmartisanInteractionSource()
     val pressed by interaction.collectSmartisanPressedAsState()
     val click = smartisanClick(onClick)
-    val scale by animateFloatAsState(
+    val pressScale by animateFloatAsState(
         targetValue = if (pressed) 0.94f else 1f,
         animationSpec = SmartisanMotion.PressSpring,
         label = "asterisk bottom bar press",
     )
-    val tint = if (selected) colors.textPrimary else colors.textTertiary
+    // Original behaviour: the active tab's glyph is tinted darker and grows slightly.
+    val iconScale by animateFloatAsState(
+        targetValue = if (selected) 1.12f else 1f,
+        animationSpec = tween(durationMillis = SmartisanMotion.DurationShort, easing = SmartisanMotion.EaseInOut),
+        label = "asterisk bottom bar icon scale",
+    )
+    // Original system tab bar: unselected glyphs are light grey, the active one darker grey.
+    val tint = if (isInDarkTheme()) {
+        if (selected) colors.textPrimary else colors.textTertiary
+    } else {
+        if (selected) AsteriskBottomBarSelectedTint else AsteriskBottomBarUnselectedTint
+    }
+    val painter = rememberSmartisanDrawablePainter(item.iconRes)
     Column(
         modifier = modifier
             .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
+                scaleX = pressScale
+                scaleY = pressScale
             }
             .clickable(
                 interactionSource = interaction,
@@ -148,10 +174,17 @@ private fun AsteriskBottomBarItemView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        SmartisanIcon(
-            res = item.iconRes,
+        Image(
+            painter = painter,
             contentDescription = item.label,
-            modifier = Modifier.height(SmartisanDimens.BottomBarIconSize),
+            modifier = Modifier
+                .size(SmartisanDimens.BottomBarIconSize)
+                .graphicsLayer {
+                    scaleX = iconScale
+                    scaleY = iconScale
+                },
+            colorFilter = ColorFilter.tint(tint),
+            contentScale = ContentScale.Fit,
         )
         SmartisanText(
             text = item.label,
