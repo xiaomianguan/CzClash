@@ -114,8 +114,7 @@ tasks.named("preBuild") {
 dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.compose.material3)
+    implementation(project(":library:ui"))
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -126,8 +125,6 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.dexlib2)
-    implementation(libs.haze)
-    implementation(libs.haze.blur)
     //noinspection UseTomlInstead
     implementation("com.github.Asterisk4Magisk:libclash:${ProjectConfig.ANDROID_LIB_CLASH_LITE_VERSION}@aar")
     implementation(dependencies.project(":asteriskd"))
@@ -137,7 +134,6 @@ dependencies {
     implementation(libs.ktor.http)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.libsu.core)
-    implementation(libs.material.kolor)
     implementation(libs.quickjs.kt.android)
     implementation(libs.snakeyaml.engine) {
         exclude(group = "org.junit.jupiter", module = "junit-jupiter-api")

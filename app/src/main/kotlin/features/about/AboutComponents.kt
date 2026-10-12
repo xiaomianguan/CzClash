@@ -4,68 +4,75 @@
 package features.about
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.ProjectInfo
 import app.R
-import ui.components.AsteriskListRow
-import ui.components.AsteriskSection
-import ui.theme.AsteriskShapeTokens
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.SmartisanDimens
+import cc.wuersan008.smartisanx.core.utils.smartisanShadowBackground
+import cc.wuersan008.smartisanx.ui.asset.SmartisanDrawables
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 
-private const val ProjectSourceUri = "https://github.com/Asterisk4Magisk/AsteriskMETA"
-private const val TelegramChannelUri = "https://t.me/Asterisk4Magisk"
 private const val AboutIconForegroundScale = 1.25f
 
+/** About logo card: original group-card texture with the app mark, name and version. */
 @Composable
-internal fun AboutIdentityHeader(
+internal fun AboutLogoCard(
     modifier: Modifier = Modifier,
 ) {
-    val identity = buildAboutIdentityState(
-        projectName = ProjectInfo.PROJECT_NAME,
-        versionName = ProjectInfo.VERSION_NAME,
-        versionCode = ProjectInfo.VERSION_CODE,
-        androidLibClashLiteVersion = ProjectInfo.ANDROID_LIB_CLASH_LITE_VERSION,
-    )
-    Column(
+    val colors = LocalSmartisanColors.current
+    val typography = LocalSmartisanTypography.current
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(top = 20.dp, bottom = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(horizontal = SmartisanDimens.ListItemHorizontalMargin)
+            .smartisanShadowBackground(
+                backgroundRes = SmartisanDrawables.GroupRowSingle,
+                shadowRes = SmartisanDrawables.GroupRowSingleShadow,
+            )
+            .height(180.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        AboutAppIcon(Modifier.size(88.dp))
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = identity.projectName,
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Text(
-            text = identity.versionLabel,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            AboutAppIcon(Modifier.size(88.dp))
+            SmartisanText(
+                text = ProjectInfo.PROJECT_NAME,
+                style = typography.title.copy(
+                    fontSize = 20.sp,
+                    letterSpacing = 1.sp,
+                    fontWeight = FontWeight.Medium,
+                ),
+                color = colors.accent,
+            )
+            SmartisanText(
+                text = "v${ProjectInfo.VERSION_NAME} (${ProjectInfo.VERSION_CODE})",
+                style = typography.caption,
+                color = colors.textTertiary,
+            )
+        }
     }
 }
 
@@ -78,9 +85,8 @@ private fun AboutAppIcon(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        androidx.compose.material3.Surface(
+        SmartisanSurface(
             modifier = Modifier.fillMaxSize(),
-            shape = AsteriskShapeTokens.PageCard,
             color = iconStyle.containerColor,
         ) {
             Image(
@@ -98,8 +104,8 @@ private fun AboutAppIcon(
 private fun aboutIconStyle(): AboutIconStyle {
     return AboutIconStyle(
         foregroundResId = R.drawable.ic_launcher_monochrome,
-        foregroundTint = MaterialTheme.colorScheme.primary,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        foregroundTint = LocalSmartisanColors.current.accent,
+        containerColor = LocalSmartisanColors.current.surface,
     )
 }
 
@@ -108,68 +114,3 @@ private data class AboutIconStyle(
     val foregroundTint: Color?,
     val containerColor: Color,
 )
-
-@Composable
-internal fun AboutRuntimeSection(
-    modifier: Modifier = Modifier,
-) {
-    AsteriskSection(
-        modifier = modifier.fillMaxWidth(),
-        title = stringResource(R.string.about_runtime),
-    ) {
-        AboutRuntimeRow("AndroidLibClashLite", ProjectInfo.ANDROID_LIB_CLASH_LITE_VERSION, Icons.Rounded.Memory)
-        AboutRuntimeRow("hev-socks5-tunnel", ProjectInfo.HEV_SOCKS5_TUNNEL_VERSION, Icons.Rounded.VpnLock)
-    }
-}
-
-@Composable
-private fun AboutRuntimeRow(name: String, version: String, icon: ImageVector) {
-    AsteriskListRow(
-        title = name,
-        summary = version,
-        leadingIcon = icon,
-    )
-}
-
-@Composable
-internal fun AboutLinksSection(
-    title: String,
-    modifier: Modifier = Modifier,
-) {
-    val uriHandler = LocalUriHandler.current
-    AsteriskSection(
-        modifier = modifier.fillMaxWidth(),
-        title = title,
-    ) {
-        AboutLinkRow(
-            title = stringResource(R.string.about_view_source),
-            icon = Icons.Rounded.Code,
-            onClick = { uriHandler.openUri(ProjectSourceUri) },
-        )
-        AboutLinkRow(
-            title = stringResource(R.string.about_join_telegram),
-            icon = Icons.AutoMirrored.Rounded.Send,
-            onClick = { uriHandler.openUri(TelegramChannelUri) },
-        )
-    }
-}
-
-@Composable
-private fun AboutLinkRow(
-    title: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    AsteriskListRow(
-        title = title,
-        leadingIcon = icon,
-        onClick = onClick,
-        trailingContent = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        },
-    )
-}

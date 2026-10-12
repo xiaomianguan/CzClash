@@ -3,13 +3,14 @@
 
 package features.settings.sheets
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -101,7 +102,7 @@ internal fun TunBypassRuleSetBottomSheet(
                             .padding(24.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        CircularProgressIndicator()
+                        AsteriskSpinner()
                     }
                     state.error.isNotBlank() -> {
                         TunBypassRuleSetStatusText(
@@ -159,10 +160,10 @@ internal fun TunBypassRuleSetBottomSheet(
                     }
                 }
             }
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.settings_tun_bypass_rule_sets_description),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.textSecondary,
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -179,9 +180,9 @@ private fun TunBypassRuleSetSection(
             .fillMaxWidth()
             .padding(top = 12.dp),
     ) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.primary,
+            color = LocalSmartisanColors.current.accent,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -195,13 +196,13 @@ private fun TunBypassRuleSetStatusText(
     text: String,
     isError: Boolean = false,
 ) {
-    Text(
+    SmartisanText(
         text = text,
-        style = MaterialTheme.typography.bodyMedium,
+        style = LocalSmartisanTypography.current.body,
         color = if (isError) {
-            MaterialTheme.colorScheme.error
+            LocalSmartisanColors.current.warning
         } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
+            LocalSmartisanColors.current.textSecondary
         },
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
     )

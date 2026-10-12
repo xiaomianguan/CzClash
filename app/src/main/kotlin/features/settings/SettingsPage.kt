@@ -3,6 +3,8 @@
 
 package features.settings
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,10 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,7 +69,6 @@ import ui.text.formatTemplate
 fun SettingsPage(
     padding: PaddingValues,
 ) {
-    val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
     AsteriskScaffold(
@@ -79,17 +77,16 @@ fun SettingsPage(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
                 placeholder = stringResource(R.string.common_search),
-                scrollBehavior = topAppBarScrollBehavior,
                 title = {
                     Column {
-                        Text(
+                        SmartisanText(
                             stringResource(R.string.settings_title),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = LocalSmartisanTypography.current.title,
                         )
-                        Text(
+                        SmartisanText(
                             "v${ProjectInfo.VERSION_NAME} (${ProjectInfo.VERSION_CODE})",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                     }
                 },
@@ -99,7 +96,6 @@ fun SettingsPage(
         SettingsContent(
             innerPadding = innerPadding,
             outerPadding = padding,
-            topAppBarScrollBehavior = topAppBarScrollBehavior,
             searchQuery = searchQuery,
         )
     }
@@ -109,7 +105,6 @@ fun SettingsPage(
 private fun SettingsContent(
     innerPadding: PaddingValues,
     outerPadding: PaddingValues,
-    topAppBarScrollBehavior: TopAppBarScrollBehavior,
     searchQuery: String,
 ) {
     val appState by LocalAppStateStore.current.collectAppState()
@@ -281,9 +276,7 @@ private fun SettingsContent(
     Box {
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.pageScrollModifiers(
-                topAppBarScrollBehavior,
-            ),
+            modifier = Modifier.pageScrollModifiers(),
             contentPadding = listPadding,
         ) {
             if (searchQuery.isNotBlank()) {

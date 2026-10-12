@@ -3,16 +3,18 @@
 
 package features.resources
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import ui.components.SectionedLazyColumn
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -165,11 +167,11 @@ fun ResourceManagementPage(
     AsteriskScaffold(
         topBar = {
             AsteriskTopAppBar(
-                title = { Text(stringResource(R.string.settings_resource_management)) },
+                title = { SmartisanText(stringResource(R.string.settings_resource_management)) },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.pop() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    SmartisanIconButton(onClick = { navigator.pop() }) {
+                        AsteriskIcon(
+                            res = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.common_back),
                         )
                     }
@@ -319,11 +321,11 @@ fun ResourceManagementPage(
 
 @Composable
 private fun ResourceSectionTitle(text: String) {
-    Text(
+    SmartisanText(
         text = text,
-        style = MaterialTheme.typography.titleSmall,
+        style = LocalSmartisanTypography.current.listRowPrimary,
         fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.primary,
+        color = LocalSmartisanColors.current.accent,
         modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
     )
 }

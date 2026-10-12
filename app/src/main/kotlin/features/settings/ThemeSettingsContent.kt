@@ -3,6 +3,8 @@
 
 package features.settings
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -18,11 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.control.SmartisanButtonTabGroup
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -67,29 +66,14 @@ internal fun ThemeSettingsContent(
         value = colorModeOptions.getOrNull(colorMode).orEmpty(),
         optionText = colorModeOptions,
     )
-    val showThemeColor = settingsRowMatchesQuery(
-        title = stringResource(R.string.settings_theme_color),
-        summary = "",
-        value = keyColorOptions.getOrNull(seedIndex).orEmpty(),
-        optionText = keyColorOptions,
-    )
-    if (!showColorMode && !showThemeColor) return
+    if (!showColorMode) return
 
     SettingsSectionCard {
-        if (showColorMode) {
-            ThemeModeSegmentedRow(
-                options = colorModeOptions,
-                selectedIndex = colorMode,
-                onSelectedIndexChange = onColorModeChange,
-            )
-        }
-        if (showThemeColor) {
-            ThemeColorDotPicker(
-                options = keyColorOptions,
-                selectedIndex = seedIndex,
-                onSelectedIndexChange = onSeedIndexChange,
-            )
-        }
+        ThemeModeSegmentedRow(
+            options = colorModeOptions,
+            selectedIndex = colorMode,
+            onSelectedIndexChange = onColorModeChange,
+        )
     }
 }
 
@@ -102,32 +86,19 @@ private fun ThemeModeSegmentedRow(
     val title = stringResource(R.string.settings_color_mode)
     val safeIndex = if (selectedIndex in options.indices) selectedIndex else 0
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
+            color = LocalSmartisanColors.current.textSecondary,
+            style = LocalSmartisanTypography.current.sectionTitle,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            options.forEachIndexed { index, label ->
-                SegmentedButton(
-                    selected = safeIndex == index,
-                    onClick = { onSelectedIndexChange(index) },
-                    shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = options.size,
-                    ),
-                ) {
-                    Text(
-                        text = label,
-                        maxLines = 1,
-                        softWrap = false,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-        }
+        SmartisanButtonTabGroup(
+            items = options,
+            selectedIndex = safeIndex,
+            onSelectedChange = onSelectedIndexChange,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -139,10 +110,10 @@ private fun ThemeColorDotPicker(
 ) {
     val title = stringResource(R.string.settings_theme_color)
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
+            color = LocalSmartisanColors.current.textSecondary,
+            style = LocalSmartisanTypography.current.sectionTitle,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
@@ -247,6 +218,6 @@ private fun dynamicAccentBrush(): Brush = Brush.sweepGradient(
  */
 @Composable
 private fun accentColorFor(index: Int): Color = when (index) {
-    0 -> MaterialTheme.colorScheme.primary
-    else -> KeyColors.getOrNull(index - 1) ?: MaterialTheme.colorScheme.primary
+    0 -> LocalSmartisanColors.current.accent
+    else -> KeyColors.getOrNull(index - 1) ?: LocalSmartisanColors.current.accent
 }

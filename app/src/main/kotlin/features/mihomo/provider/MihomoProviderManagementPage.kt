@@ -3,6 +3,8 @@
 
 package features.mihomo.provider
 
+import ui.components.AsteriskIcon
+import androidx.compose.foundation.layout.fillMaxWidth
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,13 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.PrimaryTabRow
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import cc.wuersan008.smartisanx.ui.layout.SmartisanTabRow
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.components.AsteriskTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -377,30 +378,29 @@ fun MihomoProviderManagementPage(
             topBar = {
             Column {
                 AsteriskTopAppBar(
-                    title = { Text(stringResource(R.string.mihomo_provider_management_title)) },
+                    title = { SmartisanText(stringResource(R.string.mihomo_provider_management_title)) },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        SmartisanIconButton(onClick = { navigator.pop() }) {
+                            AsteriskIcon(
+                                res = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = stringResource(R.string.common_back),
                             )
                         }
                     },
                     actions = {
                         if (selectedRefreshingAll) {
-                            CircularProgressIndicator(
+                            AsteriskSpinner(
                                 modifier = Modifier.padding(14.dp).size(20.dp),
-                                strokeWidth = 2.dp,
-                            )
+                                )
                         } else {
-                            IconButton(
+                            SmartisanIconButton(
                                 onClick = { refreshAllProviders(selectedType) },
                                 enabled = !selectedState.loading &&
                                     !selectedTypeBusy &&
                                     selectedState.providers.isNotEmpty(),
                             ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Refresh,
+                                AsteriskIcon(
+                                    res = Icons.Rounded.Refresh,
                                     contentDescription = stringResource(
                                         R.string.mihomo_provider_management_refresh_current,
                                     ),
@@ -409,24 +409,22 @@ fun MihomoProviderManagementPage(
                         }
                     },
                 )
-                PrimaryTabRow(selectedTabIndex = selectedTab.ordinal, containerColor = androidx.compose.ui.graphics.Color.Transparent) {
-                    MihomoProviderManagementTab.entries.forEach { tab ->
-                        Tab(
-                            selected = selectedTab == tab,
-                            onClick = { selectProviderTab(tab) },
-                            text = {
-                                Text(
-                                    stringResource(
-                                        when (tab) {
-                                            MihomoProviderManagementTab.Proxy -> R.string.mihomo_proxy_providers_tab
-                                            MihomoProviderManagementTab.Rule -> R.string.mihomo_rule_providers_tab
-                                        },
-                                    ),
-                                )
-                            },
-                        )
-                    }
+                val providerTabLabels = MihomoProviderManagementTab.entries.map { tab ->
+                    stringResource(
+                        when (tab) {
+                            MihomoProviderManagementTab.Proxy -> R.string.mihomo_proxy_providers_tab
+                            MihomoProviderManagementTab.Rule -> R.string.mihomo_rule_providers_tab
+                        },
+                    )
                 }
+                SmartisanTabRow(
+                    tabs = providerTabLabels,
+                    selectedIndex = selectedTab.ordinal,
+                    onSelected = { index ->
+                        MihomoProviderManagementTab.entries.getOrNull(index)?.let { selectProviderTab(it) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         },
     ) { innerPadding ->

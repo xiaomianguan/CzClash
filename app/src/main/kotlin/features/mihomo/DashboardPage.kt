@@ -7,6 +7,19 @@
 
 package features.mihomo
 
+import cc.wuersan008.smartisanx.ui.asset.SmartisanDrawables
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.ui.control.SmartisanSwitch
+import cc.wuersan008.smartisanx.ui.control.SmartisanSwitchRow
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.ui.control.SmartisanButton
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.os.SystemClock
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -24,12 +37,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanDivider
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
@@ -265,7 +275,7 @@ fun MihomoDashboardPage(
     AsteriskScaffold(
         topBar = {
             AsteriskTopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { SmartisanText(stringResource(R.string.app_name)) },
             )
         },
     ) { innerPadding ->
@@ -274,7 +284,7 @@ fun MihomoDashboardPage(
             outerPadding = padding,
             isWideScreen = isWideScreen,
         )
-        val listPadding = pageListPadding(contentPadding, bottomExtra = 24.dp)
+        val listPadding = pageListPadding(contentPadding, bottomExtra = 16.dp)
 
         LazyColumn(
             state = listState,
@@ -289,6 +299,7 @@ fun MihomoDashboardPage(
                     controllerState = controllerState,
                     networkActivityState = networkActivityState,
                     operationInProgress = operationInProgress,
+                    onToggleService = serviceControl.toggleService,
                     onModeSelected = ::changeMode,
                     onOpenConfiguration = { mainDestinationState?.select(MainDestination.Configurations) },
                     onOpenNode = { mainDestinationState?.select(MainDestination.Proxies) },
@@ -299,8 +310,8 @@ fun MihomoDashboardPage(
             }
             item("monitoring_row_one") {
                 Row(
-                    modifier = HomeContentModifier,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = HomeContentModifier.padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     MonitoringEntryCard(
                         title = stringResource(R.string.home_monitor_resource),
@@ -323,8 +334,8 @@ fun MihomoDashboardPage(
             }
             item("monitoring_row_two") {
                 Row(
-                    modifier = HomeContentModifier,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = HomeContentModifier.padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     MonitoringEntryCard(
                         title = stringResource(R.string.home_monitor_traffic),
@@ -366,6 +377,7 @@ private fun HomeControllerCard(
     controllerState: HomeControllerState,
     networkActivityState: HomeNetworkActivityState,
     operationInProgress: Boolean,
+    onToggleService: () -> Unit,
     onModeSelected: (Int) -> Unit,
     onOpenConfiguration: () -> Unit,
     onOpenNode: () -> Unit,
@@ -380,7 +392,6 @@ private fun HomeControllerCard(
         density = FocusDensity.Large,
         tone = homeFocusTone(controllerState.serviceStatus),
         summary = runModeLabel(controllerState.runMode),
-        stateIcon = Icons.Rounded.PowerSettingsNew,
         metrics = {
             HomeFocusMetric(
                 icon = Icons.Rounded.Upload,
@@ -395,8 +406,13 @@ private fun HomeControllerCard(
                 modifier = Modifier.weight(1f),
             )
         },
-        primaryAction = { HomeServiceRuntimeSummary() },
-        forcePrimaryActionStacked = shouldStackHomeServiceRuntimeSummary(),
+        primaryAction = {
+            SmartisanSwitch(
+                checked = appState.proxyRunning,
+                onCheckedChange = { onToggleService() },
+                enabled = !operationInProgress,
+            )
+        },
     ) {
         Box(modifier = Modifier.offset(y = HomeControllerContentOffset)) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -404,24 +420,25 @@ private fun HomeControllerCard(
                     appState.proxyRunning &&
                     appState.pendingMihomoRestartProfileId == appState.selectedMihomoProfileId
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        onClick = onOpenConfiguration,
+                    SmartisanSurface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .smartisanClickable(onClick = onOpenConfiguration),
+                        shape = LocalSmartisanShapes.current.large,
+                        color = LocalSmartisanColors.current.surfaceRaised,
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(Icons.Rounded.Tune, contentDescription = null)
+                            AsteriskIcon(Icons.Rounded.Tune, contentDescription = null)
                             Spacer(Modifier.size(12.dp))
-                            Text(
+                            SmartisanText(
                                 text = stringResource(R.string.mihomo_profile_restart_required),
                                 modifier = Modifier.weight(1f),
-                                style = MaterialTheme.typography.labelLarge,
+                                style = LocalSmartisanTypography.current.sectionTitle,
                             )
-                            Icon(Icons.Rounded.ChevronRight, contentDescription = null)
+                            AsteriskIcon(Icons.Rounded.ChevronRight, contentDescription = null)
                         }
                     }
                 }
@@ -457,10 +474,10 @@ private fun HomeControllerCard(
                     enabled = !controllerState.mihomoModeReadOnly && !operationInProgress,
                 )
                 if (controllerState.mihomoModeReadOnly) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.settings_value_from_yaml),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.accent,
                     )
                 }
             }
@@ -470,7 +487,7 @@ private fun HomeControllerCard(
 
 @Composable
 private fun HomeFocusMetric(
-    icon: ImageVector,
+    icon: Int,
     label: String,
     value: String,
     modifier: Modifier = Modifier,
@@ -487,16 +504,17 @@ private fun HomeFocusMetric(
 
 @Composable
 private fun HomePrimaryRow(
-    icon: ImageVector,
+    icon: Int,
     label: String,
     value: String,
     onClick: () -> Unit,
 ) {
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+    SmartisanSurface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .smartisanClickable(onClick = onClick),
         color = Color.Transparent,
-        shape = MaterialTheme.shapes.medium,
+        shape = LocalSmartisanShapes.current.medium,
     ) {
         HomeControllerItemContent(
             modifier = Modifier
@@ -512,13 +530,13 @@ private fun HomePrimaryRow(
 
 @Composable
 private fun HomeControllerItemContent(
-    icon: ImageVector,
+    icon: Int,
     label: String,
     value: String,
     modifier: Modifier = Modifier,
     iconSize: Dp = HomeControllerItemIconSize,
     iconOffsetY: Dp = 0.dp,
-    trailingIcon: ImageVector? = null,
+    trailingIcon: Int? = null,
 ) {
     Row(
         modifier = modifier,
@@ -528,11 +546,11 @@ private fun HomeControllerItemContent(
             modifier = Modifier.size(HomeControllerItemIconSlotSize),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = icon,
+            AsteriskIcon(
+                res = icon,
                 contentDescription = null,
                 modifier = Modifier.size(iconSize).offset(y = iconOffsetY),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = LocalSmartisanColors.current.textSecondary,
             )
         }
         Column(
@@ -540,25 +558,25 @@ private fun HomeControllerItemContent(
                 .weight(1f)
                 .padding(start = HomeControllerItemTextSpacing),
         ) {
-            Text(
+            SmartisanText(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
+            SmartisanText(
                 text = value,
-                style = MaterialTheme.typography.titleMedium,
+                style = LocalSmartisanTypography.current.listItemPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
         if (trailingIcon != null) {
-            Icon(
-                imageVector = trailingIcon,
+            AsteriskIcon(
+                res = trailingIcon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = LocalSmartisanColors.current.textSecondary,
             )
         }
     }
@@ -577,15 +595,15 @@ private fun NetworkActivityCard(networkActivityState: HomeNetworkActivityState) 
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.home_network_activity),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Text(
+                SmartisanText(
                     text = "↑ ${formatHomeSpeed(networkActivityState.uploadBytesPerSecond)}   ↓ ${formatHomeSpeed(networkActivityState.downloadBytesPerSecond)}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
             Spacer(Modifier.height(12.dp))
@@ -603,10 +621,10 @@ private fun NetworkActivityCard(networkActivityState: HomeNetworkActivityState) 
                         .weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.home_no_network_activity),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium,
+                        color = LocalSmartisanColors.current.textSecondary,
+                        style = LocalSmartisanTypography.current.body,
                     )
                 }
             }
@@ -619,9 +637,9 @@ private fun NetworkActivityChart(
     state: HomeNetworkActivityState,
     modifier: Modifier = Modifier,
 ) {
-    val uploadColor = MaterialTheme.colorScheme.tertiary
-    val downloadColor = MaterialTheme.colorScheme.primary
-    val baselineColor = MaterialTheme.colorScheme.outlineVariant
+    val uploadColor = LocalSmartisanColors.current.warning
+    val downloadColor = LocalSmartisanColors.current.accent
+    val baselineColor = LocalSmartisanColors.current.rowDivider
     Canvas(modifier = modifier) {
         val samples = state.networkSamples
         val maxValue = samples.maxOfOrNull { sample -> maxOf(sample.up, sample.down) }?.coerceAtLeast(1L) ?: 1L
@@ -675,17 +693,17 @@ private fun SubscriptionSummaryCard(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.home_subscription_summary),
-                style = MaterialTheme.typography.titleMedium,
+                style = LocalSmartisanTypography.current.listItemPrimary,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = LocalSmartisanColors.current.textPrimary,
             )
             if (content.showEmpty) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.home_no_subscription),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
             if (content.showPrimary) {
@@ -694,7 +712,7 @@ private fun SubscriptionSummaryCard(
             }
             if (content.showProviders) {
                 if (content.showProviderDivider) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    SmartisanDivider(color = LocalSmartisanColors.current.rowDivider)
                 }
                 HomeProviderUsageSummary(
                     state = providerUsageState,
@@ -713,11 +731,11 @@ private fun HomeProviderUsageSummary(
     onRetry: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_profile_provider_usage_title),
-            style = MaterialTheme.typography.titleSmall,
+            style = LocalSmartisanTypography.current.listRowPrimary,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = LocalSmartisanColors.current.textPrimary,
         )
         when (state) {
             MihomoProviderUsageLoadState.Hidden -> Unit
@@ -725,24 +743,24 @@ private fun HomeProviderUsageSummary(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                Text(
+                AsteriskSpinner(size = 18.dp, )
+                SmartisanText(
                     text = stringResource(R.string.mihomo_profile_provider_usage_loading),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
 
-            MihomoProviderUsageLoadState.RequiresProxyRunning -> Text(
+            MihomoProviderUsageLoadState.RequiresProxyRunning -> SmartisanText(
                 text = stringResource(R.string.mihomo_profile_provider_usage_requires_proxy),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.body,
+                color = LocalSmartisanColors.current.textSecondary,
             )
 
-            MihomoProviderUsageLoadState.Failed -> Surface(
-                onClick = onRetry,
+            MihomoProviderUsageLoadState.Failed -> SmartisanSurface(
+                modifier = Modifier.smartisanClickable(onClick = onRetry),
                 color = Color.Transparent,
-                shape = MaterialTheme.shapes.medium,
+                shape = LocalSmartisanShapes.current.medium,
             ) {
                 Column(
                     modifier = Modifier
@@ -750,15 +768,15 @@ private fun HomeProviderUsageSummary(
                         .padding(vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profile_provider_usage_failed),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.body,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profile_provider_usage_retry),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.accent,
                     )
                 }
             }
@@ -771,17 +789,17 @@ private fun HomeProviderUsageSummary(
 @Composable
 private fun HomeProviderUsageReady(items: List<MihomoProviderUsageItem>) {
     if (items.isEmpty()) {
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_proxy_providers_empty),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
         return
     }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         items.forEachIndexed { index, item ->
             if (index > 0) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SmartisanDivider(color = LocalSmartisanColors.current.rowDivider)
             }
             HomeProviderUsageItemRow(item)
         }
@@ -791,11 +809,11 @@ private fun HomeProviderUsageReady(items: List<MihomoProviderUsageItem>) {
 @Composable
 private fun HomeProviderUsageItemRow(item: MihomoProviderUsageItem) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
+        SmartisanText(
             text = item.name,
-            style = MaterialTheme.typography.titleSmall,
+            style = LocalSmartisanTypography.current.listRowPrimary,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = LocalSmartisanColors.current.textPrimary,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -805,10 +823,10 @@ private fun HomeProviderUsageItemRow(item: MihomoProviderUsageItem) {
             }
 
             MihomoProviderUsageKind.Unlimited -> {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.mihomo_provider_traffic_unlimited),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = LocalSmartisanTypography.current.listRowPrimary,
+                    color = LocalSmartisanColors.current.textPrimary,
                 )
                 SubscriptionExpiry(item.expireAtSeconds)
             }
@@ -830,10 +848,10 @@ private fun ProviderUsageStatus(
     text: String,
     error: Boolean = false,
 ) {
-    Text(
+    SmartisanText(
         text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalSmartisanTypography.current.body,
+        color = if (error) LocalSmartisanColors.current.warning else LocalSmartisanColors.current.textSecondary,
     )
 }
 
@@ -863,21 +881,21 @@ private fun SubscriptionUsage(summary: HomeSubscriptionSummary) {
 
 @Composable
 private fun SubscriptionExpiry(expireAtSeconds: Long) {
-    Text(
+    SmartisanText(
         text = stringResource(
             R.string.home_subscription_expiry,
             formatExpiry(expireAtSeconds),
         ),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalSmartisanTypography.current.listItemSecondary,
+        color = LocalSmartisanColors.current.textSecondary,
     )
 }
 
 @Composable
 private fun SubscriptionMetric(label: String, value: String) {
     Column(horizontalAlignment = Alignment.Start) {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        SmartisanText(label, style = LocalSmartisanTypography.current.listItemSecondary, color = LocalSmartisanColors.current.textSecondary)
+        SmartisanText(value, style = LocalSmartisanTypography.current.listRowPrimary, color = LocalSmartisanColors.current.textPrimary)
     }
 }
 
@@ -885,38 +903,47 @@ private fun SubscriptionMetric(label: String, value: String) {
 private fun MonitoringEntryCard(
     title: String,
     summary: String,
-    icon: ImageVector,
+    icon: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     prominent: Boolean = false,
 ) {
-    AsteriskExpressiveCard(
-        onClick = onClick,
-        modifier = modifier.height(148.dp),
-        role = if (prominent) ExpressiveShapeRole.GroupLarge else ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    SmartisanCard(
+        modifier = modifier
+            .height(148.dp)
+            .smartisanClickable(onClick = onClick),
+        backgroundRes = SmartisanDrawables.GroupRowSingle,
+        shadowRes = SmartisanDrawables.GroupRowSingleShadow,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 18.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Surface(
+            SmartisanSurface(
                 modifier = Modifier.size(42.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = LocalSmartisanColors.current.surfaceRaised,
                 shape = AsteriskShapeTokens.SmallContainer,
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AsteriskIcon(
+                        res = icon,
+                        contentDescription = null,
+                        tint = LocalSmartisanColors.current.textSecondary,
+                        size = 24.dp,
+                    )
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(
+                SmartisanText(title, style = LocalSmartisanTypography.current.listItemPrimary, fontWeight = FontWeight.SemiBold)
+                SmartisanText(
                     text = summary,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -1026,12 +1053,11 @@ private fun HomeServiceRuntimeSummary() {
     val uptime = formatHomeServiceUptime(uptimeMillis)
     if (appState.proxyRunning && uptime != null) {
         val description = stringResource(R.string.home_service_uptime, uptime)
-        Text(
+        SmartisanText(
             text = uptime,
             modifier = Modifier.semantics { contentDescription = description },
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Monospace,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
             maxLines = 1,
         )
     }

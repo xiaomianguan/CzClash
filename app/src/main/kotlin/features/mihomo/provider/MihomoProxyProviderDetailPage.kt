@@ -3,6 +3,9 @@
 
 package features.mihomo.provider
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,11 +28,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.CircularProgressIndicator
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskSpinner
 import ui.components.AsteriskSearchTopAppBar
 import ui.components.AsteriskTopBarControls
 import ui.components.AsteriskScaffold
@@ -218,11 +220,11 @@ fun MihomoProxyProviderDetailPage(
                     query = nodeSearchQuery,
                     onQueryChange = { nodeSearchQuery = it },
                     placeholder = stringResource(R.string.mihomo_provider_proxy_servers_search),
-                    title = { Text(provider?.name ?: providerName, maxLines = 1) },
+                    title = { SmartisanText(provider?.name ?: providerName, maxLines = 1) },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        SmartisanIconButton(onClick = { navigator.pop() }) {
+                            AsteriskIcon(
+                                res = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = stringResource(R.string.common_back),
                             )
                         }
@@ -242,7 +244,7 @@ fun MihomoProxyProviderDetailPage(
             outerPadding = padding,
             isWideScreen = isWideScreen,
         )
-        val listPadding = pageListPadding(contentPadding, bottomExtra = 104.dp)
+        val listPadding = pageListPadding(contentPadding, bottomExtra = 16.dp)
         Box(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 state = nodeFilterPagerState,
@@ -397,18 +399,18 @@ private fun ProviderNodeCard(
     AsteriskExpressiveCard(
         modifier = modifier.fillMaxWidth().heightIn(min = 76.dp),
         role = ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = node.title.ifBlank { node.name },
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -421,10 +423,10 @@ private fun ProviderNodeCard(
                     )
                     if (subtitle.isNotBlank()) {
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
+                        SmartisanText(
                             text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -440,14 +442,13 @@ private fun ProviderNodeCard(
                 contentAlignment = Alignment.Center,
             ) {
                 if (testing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.5.dp,
-                    )
+                    AsteriskSpinner(
+                        size = 20.dp,
+                        )
                 } else {
-                    Text(
+                    SmartisanText(
                         text = node.delayText(),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = LocalSmartisanTypography.current.sectionTitle,
                         fontWeight = FontWeight.Medium,
                         color = node.providerDelayColor(),
                         textAlign = TextAlign.Center,
@@ -469,13 +470,13 @@ private fun MihomoProxyProviderNode.providerDelayColor(): Color {
     val darkTheme = isSystemInDarkTheme()
     return when {
         delayStatus == MihomoDelayStatus.Timeout || delayStatus == MihomoDelayStatus.Failed -> {
-            MaterialTheme.colorScheme.error
+            LocalSmartisanColors.current.warning
         }
-        delayStatus == null || delay == null -> MaterialTheme.colorScheme.onSurfaceVariant
+        delayStatus == null || delay == null -> LocalSmartisanColors.current.textSecondary
         delay < 100 -> if (darkTheme) Color(0xFF6BD58A) else Color(0xFF128A3C)
         delay < 200 -> if (darkTheme) Color(0xFFFFC857) else Color(0xFFD18A00)
         delay < 400 -> if (darkTheme) Color(0xFFFF9B63) else Color(0xFFE06400)
-        else -> MaterialTheme.colorScheme.error
+        else -> LocalSmartisanColors.current.warning
     }
 }
 

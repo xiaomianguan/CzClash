@@ -3,9 +3,14 @@
 
 package features.mihomo
 
+import ui.components.AsteriskIcon
+import ui.components.AsteriskStateField
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.ui.window.Dialog
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Card
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.BoxWithConstraints
 import ui.layout.codeEditorShowsSupportingContent
@@ -32,18 +37,16 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanConfirmDialog
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import ui.components.AsteriskTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -147,11 +150,11 @@ fun MihomoOverrideScriptListPage(
     AsteriskScaffold(
         topBar = {
             AsteriskTopAppBar(
-                title = { Text(stringResource(R.string.mihomo_override_scripts_title)) },
+                title = { SmartisanText(stringResource(R.string.mihomo_override_scripts_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.pop() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    SmartisanIconButton(onClick = { navigator.pop() }) {
+                        AsteriskIcon(
+                            res = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.common_back),
                         )
                     }
@@ -203,36 +206,18 @@ fun MihomoOverrideScriptListPage(
             val referenceCount = appState.mihomoProfiles.count { profile ->
                 profile.overrideScriptId == script.id
             }
-            AlertDialog(
+            SmartisanConfirmDialog(
                 onDismissRequest = { pendingDeletion = null },
-                title = { Text(stringResource(R.string.mihomo_override_script_delete_title)) },
-                text = {
-                    Text(
-                        pluralStringResource(
-                            R.plurals.mihomo_override_script_delete_message,
-                            referenceCount,
-                            script.name,
-                            referenceCount,
-                        ),
-                    )
-                },
-                dismissButton = {
-                    AsteriskActionButton(
-                        text = stringResource(R.string.common_cancel),
-                        icon = Icons.Rounded.Close,
-                        onClick = { pendingDeletion = null },
-                    )
-                },
-                confirmButton = {
-                    AsteriskActionButton(
-                        text = stringResource(R.string.common_delete),
-                        icon = Icons.Rounded.Delete,
-                        onClick = {
-                            pendingDeletion = null
-                            deleteScript(script)
-                        },
-                    )
-                },
+                title = stringResource(R.string.mihomo_override_script_delete_title),
+                message = pluralStringResource(
+                    R.plurals.mihomo_override_script_delete_message,
+                    referenceCount,
+                    script.name,
+                    referenceCount,
+                ),
+                confirmText = stringResource(R.string.common_delete),
+                dismissText = stringResource(R.string.common_cancel),
+                onConfirm = { deleteScript(script) },
             )
         }
     }
@@ -247,26 +232,26 @@ private fun MihomoOverrideScriptEmptyState() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.secondaryContainer,
+        SmartisanSurface(
+            shape = LocalSmartisanShapes.current.medium,
+            color = LocalSmartisanColors.current.surfaceRaised,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Code,
+            AsteriskIcon(
+                res = Icons.Rounded.Code,
                 contentDescription = null,
                 modifier = Modifier.padding(18.dp).size(32.dp),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = LocalSmartisanColors.current.textPrimary,
             )
         }
-        Text(
+        SmartisanText(
             text = stringResource(R.string.common_empty),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.listItemPrimary,
+            color = LocalSmartisanColors.current.textSecondary,
         )
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_override_script_empty_summary),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -285,34 +270,34 @@ private fun MihomoOverrideScriptCard(
         onClick = onEdit,
         modifier = Modifier.fillMaxWidth().heightIn(min = 66.dp),
         role = ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.secondaryContainer,
+            SmartisanSurface(
+                shape = LocalSmartisanShapes.current.medium,
+                color = LocalSmartisanColors.current.surfaceRaised,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Code,
+                AsteriskIcon(
+                    res = Icons.Rounded.Code,
                     contentDescription = null,
                     modifier = Modifier.padding(10.dp).size(22.dp),
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    tint = LocalSmartisanColors.current.textPrimary,
                 )
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = script.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = listOf(
                         pluralStringResource(
                             R.plurals.mihomo_override_script_profile_count,
@@ -325,41 +310,41 @@ private fun MihomoOverrideScriptCard(
                             lineCount,
                         ),
                     ).joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                 )
             }
             Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreVert,
+                SmartisanIconButton(onClick = { menuExpanded = true }) {
+                    AsteriskIcon(
+                        res = Icons.Rounded.MoreVert,
                         contentDescription = stringResource(R.string.mihomo_profile_actions),
                     )
                 }
-                DropdownMenu(
+                AsteriskPopupMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.common_edit)) },
-                        leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.common_edit)) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.Edit, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
                             onEdit()
                         },
                     )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.common_copy)) },
-                        leadingIcon = { Icon(Icons.Rounded.ContentCopy, contentDescription = null) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.common_copy)) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.ContentCopy, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
                             onDuplicate()
                         },
                     )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.common_delete)) },
-                        leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.common_delete)) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.Delete, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
                             onDelete()
@@ -480,31 +465,30 @@ fun MihomoOverrideScriptEditPage(
     AsteriskScaffold(
         topBar = {
             AsteriskTopAppBar(
-                title = { Text(title, maxLines = 1) },
+                title = { SmartisanText(title, maxLines = 1) },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.pop() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    SmartisanIconButton(onClick = { navigator.pop() }) {
+                        AsteriskIcon(
+                            res = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.common_back),
                         )
                     }
                 },
                 actions = {
-                    TextButton(
+                    AsteriskLinkButton(
                         onClick = ::runScriptDebug,
                         enabled = !debugRunning,
                     ) {
                         if (debugRunning) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp,
-                            )
+                            AsteriskSpinner(
+                                size = 18.dp,
+                                )
                             Spacer(Modifier.width(6.dp))
                         } else {
-                            Icon(Icons.Rounded.BugReport, contentDescription = null)
+                            AsteriskIcon(Icons.Rounded.BugReport, contentDescription = null)
                             Spacer(Modifier.width(6.dp))
                         }
-                        Text(
+                        SmartisanText(
                             stringResource(
                                 if (debugRunning) {
                                     R.string.mihomo_override_script_debug_running
@@ -514,12 +498,12 @@ fun MihomoOverrideScriptEditPage(
                             ),
                         )
                     }
-                    TextButton(
+                    AsteriskLinkButton(
                         onClick = ::saveScript,
                     ) {
-                        Icon(Icons.Rounded.Save, contentDescription = null)
+                        AsteriskIcon(Icons.Rounded.Save, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.common_save))
+                        SmartisanText(stringResource(R.string.common_save))
                     }
                 },
             )
@@ -542,9 +526,9 @@ fun MihomoOverrideScriptEditPage(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profile_missing),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
                 }
             } else {
@@ -555,10 +539,10 @@ fun MihomoOverrideScriptEditPage(
                         exit = AsteriskMotion.contentExit(),
                     ) {
                         Column {
-                            OutlinedTextField(
+                            AsteriskStateField(
                                 shape = AsteriskShapeTokens.InnerContainer,
                                 state = nameState,
-                                label = { Text(stringResource(R.string.mihomo_override_script_name)) },
+                                label = { SmartisanText(stringResource(R.string.mihomo_override_script_name)) },
                                 lineLimits = TextFieldLineLimits.SingleLine,
                                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                             )
@@ -647,31 +631,31 @@ private fun MihomoOverrideScriptDebugDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        Card(
+        SmartisanCard(
             modifier = Modifier.fillMaxWidth().widthIn(max = 880.dp).padding(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+            color = LocalSmartisanColors.current.surfaceRaised,
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_override_script_debug_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = LocalSmartisanTypography.current.title,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Surface(
-                        shape = MaterialTheme.shapes.small,
+                    SmartisanSurface(
+                        shape = LocalSmartisanShapes.current.small,
                         color = if (result.success) {
-                            MaterialTheme.colorScheme.primaryContainer
+                            LocalSmartisanColors.current.selectionBackground
                         } else {
-                            MaterialTheme.colorScheme.errorContainer
+                            LocalSmartisanColors.current.surfaceRaised
                         },
                     ) {
-                        Text(
+                        SmartisanText(
                             text = stringResource(
                                 if (result.success) {
                                     R.string.mihomo_override_script_debug_success
@@ -679,7 +663,7 @@ private fun MihomoOverrideScriptDebugDialog(
                                     R.string.mihomo_override_script_debug_failed
                                 },
                             ),
-                            style = MaterialTheme.typography.labelLarge,
+                            style = LocalSmartisanTypography.current.sectionTitle,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         )
                     }
@@ -723,13 +707,13 @@ private fun MihomoOverrideScriptDebugDialog(
                                 selected = !showOutput,
                                 onClick = { showOutput = false },
                                 label = stringResource(R.string.mihomo_override_script_debug_logs),
-                                leadingIcon = { Icon(Icons.Rounded.Code, contentDescription = null) },
+                                leadingIcon = { AsteriskIcon(Icons.Rounded.Code, contentDescription = null) },
                             )
                             AsteriskFilterChip(
                                 selected = showOutput,
                                 onClick = { showOutput = true },
                                 label = stringResource(R.string.mihomo_override_script_debug_output),
-                                leadingIcon = { Icon(Icons.Rounded.Description, contentDescription = null) },
+                                leadingIcon = { AsteriskIcon(Icons.Rounded.Description, contentDescription = null) },
                             )
                         }
                         AnimatedContent(
@@ -746,15 +730,15 @@ private fun MihomoOverrideScriptDebugDialog(
                                     modifier = Modifier.fillMaxSize(),
                                 )
                             } else {
-                                Surface(
+                                SmartisanSurface(
                                     modifier = Modifier.fillMaxSize(),
-                                    shape = MaterialTheme.shapes.large,
-                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    shape = LocalSmartisanShapes.current.large,
+                                    color = LocalSmartisanColors.current.surfaceRaised,
                                 ) {
                                     SelectionContainer {
-                                        Text(
+                                        SmartisanText(
                                             text = consoleText,
-                                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                                            style = LocalSmartisanTypography.current.listItemSecondary.copy(fontFamily = FontFamily.Monospace),
                                             modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
                                         )
                                     }
@@ -790,32 +774,32 @@ private fun DebugSection(
     modifier: Modifier = Modifier,
     error: Boolean = false,
 ) {
-    Surface(
+    SmartisanSurface(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = LocalSmartisanShapes.current.large,
         color = if (error) {
-            MaterialTheme.colorScheme.errorContainer
+            LocalSmartisanColors.current.surfaceRaised
         } else {
-            MaterialTheme.colorScheme.surfaceContainerLow
+            LocalSmartisanColors.current.surface
         },
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            Text(
+            SmartisanText(
                 text = title,
-                style = MaterialTheme.typography.labelLarge,
+                style = LocalSmartisanTypography.current.sectionTitle,
                 color = if (error) {
-                    MaterialTheme.colorScheme.onErrorContainer
+                    LocalSmartisanColors.current.warning
                 } else {
-                    MaterialTheme.colorScheme.primary
+                    LocalSmartisanColors.current.accent
                 },
             )
-            Text(
+            SmartisanText(
                 text = body,
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                style = LocalSmartisanTypography.current.listItemSecondary.copy(fontFamily = FontFamily.Monospace),
                 color = if (error) {
-                    MaterialTheme.colorScheme.onErrorContainer
+                    LocalSmartisanColors.current.warning
                 } else {
-                    MaterialTheme.colorScheme.onSurface
+                    LocalSmartisanColors.current.textPrimary
                 },
                 modifier = Modifier.padding(top = 4.dp),
             )

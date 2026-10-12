@@ -8,13 +8,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -61,9 +61,9 @@ internal fun Modifier.asteriskPillIndicator(
 /** Keep the navigation and mode-control tint identical while their motion differs. */
 @Composable
 private fun asteriskPillSelectionColor(enabled: Boolean = true): Color {
-    val colors = MaterialTheme.colorScheme
+    val colors = LocalSmartisanColors.current
     val tintAlpha = if (colors.surface.luminance() < 0.5f) 0.18f else 0.12f
-    return colors.primary.copy(alpha = tintAlpha * if (enabled) 1f else 0.55f)
+    return colors.accent.copy(alpha = tintAlpha * if (enabled) 1f else 0.55f)
 }
 
 /** Fade and expand at this item's center, never travel across other destinations. */

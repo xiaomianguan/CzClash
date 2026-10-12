@@ -3,6 +3,7 @@
 
 package features.settings.sheets
 
+import ui.components.AsteriskStateField
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +26,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ui.theme.AsteriskShapeTokens
 import engine.network.toPortOrNull
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.components.StringListStatusText
 
 private val SettingsSheetHorizontalPadding = 16.dp
@@ -96,8 +97,8 @@ internal fun SheetTextField(
             }
     }
 
-    OutlinedTextField(
-        label = { Text(label) },
+    AsteriskStateField(
+        label = { SmartisanText(label) },
         state = rememberTextFieldState(initialText = value),
         lineLimits = TextFieldLineLimits.SingleLine,
         shape = AsteriskShapeTokens.InnerContainer,

@@ -3,6 +3,13 @@
 
 package features.resources
 
+import ui.components.AsteriskIcon
+import ui.components.AsteriskStateField
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import ui.components.AsteriskDropdownAnchor
 import ui.components.AsteriskDropdownMenuItem
 import androidx.compose.foundation.layout.Arrangement
@@ -21,19 +28,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskProgressBar
+
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -41,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -116,35 +118,35 @@ internal fun ResourceOverviewCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Storage,
+                AsteriskIcon(
+                    res = Icons.Rounded.Storage,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = LocalSmartisanColors.current.accent,
                 )
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.settings_resource_files_overview),
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
             // Keep the full touch target without letting it add space above the title.
-            IconButton(
+            SmartisanIconButton(
                 onClick = onSettings,
                 modifier = Modifier
                     .matchParentSize()
                     .wrapContentSize(Alignment.CenterEnd, unbounded = true)
                     .size(48.dp),
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Settings,
+                AsteriskIcon(
+                    res = Icons.Rounded.Settings,
                     contentDescription = stringResource(R.string.settings_title),
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = LocalSmartisanColors.current.textSecondary,
                 )
             }
         }
-        Text(
+        SmartisanText(
             text = pluralStringResource(
                 R.plurals.settings_resource_files_overview_ready,
                 overview.readyCount,
@@ -152,18 +154,18 @@ internal fun ResourceOverviewCard(
                 overview.totalCount,
                 overview.totalSizeBytes.toReadableBytes(maxUnit = ReadableByteUnit.GiB),
             ),
-            style = MaterialTheme.typography.titleLarge,
+            style = LocalSmartisanTypography.current.title,
             fontWeight = FontWeight.SemiBold,
         )
         if (updating) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            AsteriskSpinner(modifier = Modifier.fillMaxWidth(), size = 20.dp)
         }
         Box(modifier = Modifier.align(Alignment.End)) {
-            TextButton(
+            AsteriskLinkButton(
                 onClick = { sourceMenuExpanded = true },
                 enabled = actionsEnabled && !updating,
             ) {
-                Text(stringResource(R.string.settings_resource_files_source))
+                SmartisanText(stringResource(R.string.settings_resource_files_source))
                 Spacer(Modifier.width(4.dp))
                 AsteriskDropdownAnchor(
                     expanded = sourceMenuExpanded,
@@ -242,10 +244,10 @@ internal fun CustomResourceSourceEditorSheet(
 
 @Composable
 private fun ResourceUrlField(state: TextFieldState, label: String) {
-    OutlinedTextField(
+    AsteriskStateField(
         shape = AsteriskShapeTokens.InnerContainer,
         state = state,
-        label = { Text(label) },
+        label = { SmartisanText(label) },
         lineLimits = TextFieldLineLimits.SingleLine,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -296,65 +298,65 @@ private fun ResourceFileCardSurface(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     val updatingDescription = stringResource(R.string.settings_resource_file_updating)
-    Card(
+    SmartisanCard(
         modifier = modifier.fillMaxWidth().heightIn(min = 84.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        color = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            SmartisanSurface(
+                shape = LocalSmartisanShapes.current.medium,
+                color = LocalSmartisanColors.current.surfaceRaised,
             ) {
-                Icon(
-                    imageVector = resourceVisualKind(fileName).icon(),
+                AsteriskIcon(
+                    res = resourceVisualKind(fileName).icon(),
                     contentDescription = null,
                     modifier = Modifier.padding(10.dp).size(22.dp),
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = LocalSmartisanColors.current.accent,
                 )
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = fileName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (!description.isNullOrBlank()) {
-                    Text(
+                    SmartisanText(
                         text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
                 if (status.exists) {
-                    Text(
+                    SmartisanText(
                         text = status.sizeText(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     if (!status.isBundledCore) {
-                        Text(
+                        SmartisanText(
                             text = status.updatedAtText(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
                 } else {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.settings_resource_files_missing),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.warning,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -372,48 +374,47 @@ private fun ResourceFileCardSurface(
             )
             Box {
                 when (updateState) {
-                    ResourceFileUpdateDisplayState.Idle -> IconButton(
+                    ResourceFileUpdateDisplayState.Idle -> SmartisanIconButton(
                         onClick = { menuExpanded = true },
                         enabled = actionsEnabled,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
+                        AsteriskIcon(
+                            res = Icons.Rounded.MoreVert,
                             contentDescription = stringResource(R.string.mihomo_profile_actions),
                         )
                     }
 
-                    ResourceFileUpdateDisplayState.Queued -> IconButton(
+                    ResourceFileUpdateDisplayState.Queued -> SmartisanIconButton(
                         onClick = {},
                         enabled = false,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
+                        AsteriskIcon(
+                            res = Icons.Rounded.Refresh,
                             contentDescription = stringResource(
                                 R.string.settings_resource_file_update_queued,
                             ),
                         )
                     }
 
-                    ResourceFileUpdateDisplayState.Running -> IconButton(
+                    ResourceFileUpdateDisplayState.Running -> SmartisanIconButton(
                         onClick = {},
                         enabled = false,
                     ) {
-                        CircularProgressIndicator(
+                        AsteriskSpinner(
                             modifier = Modifier
                                 .size(20.dp)
                                 .semantics { contentDescription = updatingDescription },
-                            strokeWidth = 2.dp,
-                        )
+                            )
                     }
                 }
-                DropdownMenu(
+                AsteriskPopupMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     actions.forEach { entry ->
-                        DropdownMenuItem(
-                            text = { Text(entry.action.label()) },
-                            leadingIcon = { Icon(entry.action.icon(), contentDescription = null) },
+                        AsteriskPopupMenuItem(
+                            text = { SmartisanText(entry.action.label()) },
+                            leadingIcon = { AsteriskIcon(entry.action.icon(), contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
                                 entry.onClick()
@@ -426,7 +427,7 @@ private fun ResourceFileCardSurface(
     }
 }
 
-private fun ResourceVisualKind.icon(): ImageVector {
+private fun ResourceVisualKind.icon(): Int {
     return when (this) {
         ResourceVisualKind.Core -> Icons.Rounded.Memory
         ResourceVisualKind.GeoIp -> Icons.Rounded.Public
@@ -438,7 +439,7 @@ private fun ResourceVisualKind.icon(): ImageVector {
     }
 }
 
-private fun ResourceDisplayAction.icon(): ImageVector {
+private fun ResourceDisplayAction.icon(): Int {
     return when (this) {
         ResourceDisplayAction.Update -> Icons.Rounded.Refresh
         ResourceDisplayAction.Replace -> Icons.Rounded.FileUpload

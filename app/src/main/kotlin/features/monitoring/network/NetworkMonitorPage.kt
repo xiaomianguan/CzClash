@@ -3,6 +3,11 @@
 
 package features.monitoring.network
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -17,15 +22,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanDivider
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -74,14 +76,14 @@ internal fun NetworkMonitorPage(padding: PaddingValues) {
         title = stringResource(R.string.monitor_network_title),
         outerPadding = padding,
         actions = {
-            IconButton(
+            SmartisanIconButton(
                 onClick = { services.monitoring.refreshNetworkStatus() },
                 enabled = !network.publicProbe.refreshing,
             ) {
                 if (network.publicProbe.refreshing) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.5.dp)
+                    AsteriskSpinner(size = 24.dp, )
                 } else {
-                    Icon(Icons.Rounded.Refresh, stringResource(R.string.monitor_refresh))
+                    AsteriskIcon(Icons.Rounded.Refresh, stringResource(R.string.monitor_refresh))
                 }
             }
         },
@@ -100,10 +102,10 @@ internal fun NetworkMonitorPage(padding: PaddingValues) {
             item("public") {
                 MonitoringSectionCard(stringResource(R.string.monitor_network_public), NetworkContentModifier) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
+                        SmartisanText(
                             stringResource(R.string.monitor_network_probe_source),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                         PublicAddressFamilyCard(
                             family = AddressFamily.Ipv4,
@@ -157,13 +159,13 @@ internal fun NetworkMonitorPage(padding: PaddingValues) {
             }
             item("privacy") {
                 MonitoringSectionCard(stringResource(R.string.monitor_network_privacy), NetworkContentModifier) {
-                    Text(
+                    SmartisanText(
                         stringResource(
                             R.string.monitor_network_privacy_body,
                             DefaultPublicProbeEndpoints.joinToString { it.host },
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.body,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
                 }
             }
@@ -183,9 +185,9 @@ private fun PublicAddressFamilyCard(
     val familyLabel = stringResource(
         if (family == AddressFamily.Ipv4) R.string.common_ipv4 else R.string.common_ipv6
     )
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        shape = MaterialTheme.shapes.large,
+    SmartisanCard(
+        color = LocalSmartisanColors.current.surfaceRaised,
+        shape = LocalSmartisanShapes.current.large,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -196,18 +198,18 @@ private fun PublicAddressFamilyCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
+                SmartisanText(
                     text = familyLabel,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                 )
                 if (generalResult.hasRetryableError || cloudflareResult.hasRetryableError) {
-                    TextButton(
+                    AsteriskLinkButton(
                         onClick = onRetry,
                         enabled = !refreshing,
                     ) {
-                        Text(stringResource(R.string.monitor_retry))
+                        SmartisanText(stringResource(R.string.monitor_retry))
                     }
                 }
             }
@@ -219,8 +221,8 @@ private fun PublicAddressFamilyCard(
                 onCopy = { onCopy(familyLabel, it) },
             )
 
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+            SmartisanDivider(
+                color = LocalSmartisanColors.current.rowDivider.copy(alpha = 0.5f),
                 modifier = Modifier.padding(vertical = 2.dp),
             )
 
@@ -246,10 +248,10 @@ private fun PublicAddressSection(
 ) {
     val locationSummary = result.locationSummary(formatCloudflareColo(result.colo))
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
+        SmartisanText(
             text = title,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.listItemSecondary,
+            color = LocalSmartisanColors.current.textSecondary,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -257,7 +259,7 @@ private fun PublicAddressSection(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 if (result.error == PublicProbeError.Unavailable) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(
                             if (family == AddressFamily.Ipv6) {
                                 R.string.monitor_network_probe_unallocated_ipv6
@@ -265,50 +267,50 @@ private fun PublicAddressSection(
                                 R.string.monitor_network_probe_unallocated_ipv4
                             }
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.body,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
                 } else {
-                    Text(
+                    SmartisanText(
                         text = result.address.ifBlank { "—" },
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = LocalSmartisanTypography.current.body,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
                 if (locationSummary.isNotBlank()) {
-                    Text(
+                    SmartisanText(
                         text = locationSummary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = LocalSmartisanTypography.current.body,
+                        color = LocalSmartisanColors.current.accent,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
                 result.durationMillis?.let { duration ->
-                    Text(
+                    SmartisanText(
                         stringResource(R.string.monitor_network_request_duration_value, duration),
                         modifier = Modifier.padding(top = 2.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
                 }
             }
             if (result.address.isNotBlank() && result.error != PublicProbeError.Unavailable) {
-                IconButton(onClick = { onCopy(result.address) }) {
-                    Icon(Icons.Rounded.ContentCopy, stringResource(R.string.monitor_copy_value))
+                SmartisanIconButton(onClick = { onCopy(result.address) }) {
+                    AsteriskIcon(Icons.Rounded.ContentCopy, stringResource(R.string.monitor_copy_value))
                 }
             }
         }
         if (result.error != null && result.error != PublicProbeError.Unavailable) {
-            Text(
+            SmartisanText(
                 result.errorMessage.ifBlank { publicProbeErrorLabel(result.error) },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.warning,
             )
             if (result.stale) {
-                Text(stringResource(R.string.monitor_data_stale), style = MaterialTheme.typography.bodySmall)
+                SmartisanText(stringResource(R.string.monitor_data_stale), style = LocalSmartisanTypography.current.listItemSecondary)
             }
         }
     }
@@ -330,8 +332,8 @@ private fun CopyableRows(label: String, values: List<String>, onCopy: (String, S
                 value = value,
                 verticalAlignment = Alignment.CenterVertically,
                 trailing = {
-                    IconButton(onClick = { onCopy(label, value) }) {
-                        Icon(Icons.Rounded.ContentCopy, stringResource(R.string.monitor_copy_value))
+                    SmartisanIconButton(onClick = { onCopy(label, value) }) {
+                        AsteriskIcon(Icons.Rounded.ContentCopy, stringResource(R.string.monitor_copy_value))
                     }
                 },
             )

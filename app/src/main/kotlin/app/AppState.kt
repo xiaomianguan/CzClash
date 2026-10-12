@@ -3,6 +3,7 @@
 
 package app
 
+import app.modes.ColorModeLight
 import app.modes.ColorModeSystem
 import app.modes.LanguageModeSystem
 import app.modes.MihomoModeRule
@@ -35,7 +36,9 @@ import engine.mihomo.MihomoSnifferProtocolOverrideFollowGlobal
 import features.resources.ResourceFileSourceMetaCubeXGithub
 
 data class AppState(
-    val colorMode: Int = ColorModeSystem,
+    // smartisanx treats dark mode as experimental; Smartisan OS itself only ships a light
+    // design, so the app defaults to light instead of following the system setting.
+    val colorMode: Int = ColorModeLight,
     val languageMode: Int = LanguageModeSystem,
     val seedIndex: Int = 0,
     val hideRecentTasks: Boolean = false,

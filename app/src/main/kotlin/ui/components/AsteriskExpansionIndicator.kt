@@ -4,8 +4,7 @@
 package ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,15 +18,15 @@ internal fun AsteriskExpansionIndicator(
     expanded: Boolean,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
-    tint: Color = LocalContentColor.current,
+    tint: Color = Color.Unspecified,
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
         animationSpec = AsteriskMotion.fastEffects(),
         label = "asterisk-expansion-indicator",
     )
-    Icon(
-        imageVector = Icons.Rounded.ExpandMore,
+    AsteriskIcon(
+        res = Icons.Rounded.ExpandMore,
         contentDescription = contentDescription,
         modifier = modifier.rotate(rotation),
         tint = tint,

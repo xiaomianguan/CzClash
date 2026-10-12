@@ -3,16 +3,16 @@
 
 package features.settings.sheets
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import app.R
 import ui.icons.AsteriskIcons as Icons
 import androidx.compose.ui.res.stringResource
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.text.formatTemplate
 import utils.toTrimmedNonEmptyDistinctList
 
@@ -118,7 +118,7 @@ private fun externalInterfaceGroupTitle(group: ExternalInterfaceGroup): String {
     }
 }
 
-private fun externalInterfaceGroupIcon(group: ExternalInterfaceGroup): ImageVector {
+private fun externalInterfaceGroupIcon(group: ExternalInterfaceGroup): Int {
     return when (group.key) {
         "wifi" -> Icons.Rounded.Wifi
         "usb" -> Icons.Rounded.Usb
@@ -130,10 +130,10 @@ private fun externalInterfaceGroupIcon(group: ExternalInterfaceGroup): ImageVect
 
 @Composable
 private fun SheetStatusText(text: String) {
-    Text(
+    SmartisanText(
         text = text,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodyMedium,
+        color = LocalSmartisanColors.current.textSecondary,
+        style = LocalSmartisanTypography.current.body,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }

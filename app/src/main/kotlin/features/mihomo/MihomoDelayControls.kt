@@ -3,17 +3,20 @@
 
 package features.mihomo
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -42,42 +45,50 @@ internal fun MihomoDelayToolbar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (canLocate) {
-            FloatingActionButton(
-                onClick = onLocate,
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                shape = CircleShape,
-                modifier = Modifier.size(56.dp),
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(LocalSmartisanColors.current.surfaceRaised)
+                    .smartisanClickable(onClick = onLocate),
+                contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.MyLocation,
+                AsteriskIcon(
+                    res = Icons.Rounded.MyLocation,
                     contentDescription = stringResource(R.string.mihomo_proxies_locate_selected),
+                    tint = LocalSmartisanColors.current.textPrimary,
                     modifier = Modifier.size(24.dp),
                 )
             }
         }
-        ExtendedFloatingActionButton(
-            onClick = { if (enabled) onDelayTest() },
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                alpha = if (enabled && !testing) 1f else 0.45f,
-            ),
-            icon = {
-                if (testing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.5.dp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Rounded.Speed,
-                        contentDescription = stringResource(R.string.mihomo_proxies_group_test),
-                    )
-                }
-            },
-            text = { Text(stringResource(R.string.mihomo_proxies_group_test)) },
-        )
+        Row(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(LocalSmartisanColors.current.selectionBackground)
+                .smartisanClickable(enabled = enabled, onClick = onDelayTest)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (testing) {
+                AsteriskSpinner(
+                    size = 20.dp,
+                    color = LocalSmartisanColors.current.textPrimary,
+                )
+            } else {
+                AsteriskIcon(
+                    res = Icons.Rounded.Speed,
+                    contentDescription = stringResource(R.string.mihomo_proxies_group_test),
+                    tint = LocalSmartisanColors.current.textPrimary,
+                )
+            }
+            SmartisanText(
+                text = stringResource(R.string.mihomo_proxies_group_test),
+                color = LocalSmartisanColors.current.textPrimary.copy(
+                    alpha = if (enabled && !testing) 1f else 0.45f,
+                ),
+            )
+        }
     }
 }
 

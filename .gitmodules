@@ -10,3 +10,6 @@
 [submodule "bpfmatcher/src/main/native"]
 	path = bpfmatcher/src/main/native
 	url = https://github.com/Asterisk4Magisk/bpfmatcher.git
+[submodule "smartisanx"]
+	path = smartisanx
+	url = https://github.com/xiaomianguan/smartisanx.git

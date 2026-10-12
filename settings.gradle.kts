@@ -54,3 +54,13 @@ include(":asteriskd")
 include(":bpfmatcher")
 include(":bpf2socks")
 include(":hevtun")
+
+// Smartisan-style Compose component library, vendored through the `smartisanx` submodule.
+// The library's own build scripts reference the sibling module as `:library:core`, so the
+// project paths keep that name while their directories point into the submodule.
+include(":library")
+project(":library").projectDir = file("smartisanx/library")
+include(":library:core")
+project(":library:core").projectDir = file("smartisanx/library/core")
+include(":library:ui")
+project(":library:ui").projectDir = file("smartisanx/library/ui")

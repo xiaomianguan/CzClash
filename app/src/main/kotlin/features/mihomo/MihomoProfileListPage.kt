@@ -3,6 +3,13 @@
 
 package features.mihomo
 
+import ui.components.AsteriskTitleBarButton
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,20 +31,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskProgressBar
 import ui.components.AsteriskModalBottomSheet
 import ui.components.AsteriskActionButton
+import ui.components.AsteriskEmptyState
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.components.AsteriskTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +53,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
@@ -772,7 +775,7 @@ fun MihomoProfileListPage(
         topBar = {
             AsteriskTopAppBar(
                 title = {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profiles_title),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -780,36 +783,32 @@ fun MihomoProfileListPage(
                 },
                 navigationIcon = {
                     onBack?.let { navigateBack ->
-                        IconButton(onClick = navigateBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        SmartisanIconButton(onClick = navigateBack) {
+                            AsteriskIcon(
+                                res = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = stringResource(R.string.common_back),
                             )
                         }
                     }
-                },
-                actions = {
-                    IconButton(
+                    SmartisanIconButton(
                         onClick = ::syncAllSubscriptions,
                         enabled = remoteSubscriptionProfiles.isNotEmpty() &&
                             syncingProfileIds.isEmpty() &&
                             batchSyncJob?.isActive != true &&
                             activeSubscriptionUpdateRequests == 0,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Sync,
+                        AsteriskIcon(
+                            res = Icons.Rounded.Sync,
                             contentDescription = stringResource(R.string.mihomo_profile_sync_all),
                         )
                     }
                 },
-            )
-        },
-        floatingActionButton = {
-            AsteriskExtendedFab(
-                onClick = { showImportDialog = true },
-                icon = Icons.Rounded.Add,
-                text = stringResource(R.string.mihomo_profile_add),
-                modifier = Modifier.padding(bottom = floatingActionButtonBottomPadding),
+                actions = {
+                    AsteriskTitleBarButton(
+                        text = stringResource(R.string.common_add),
+                        onClick = { showImportDialog = true },
+                    )
+                },
             )
         },
     ) { innerPadding ->
@@ -818,7 +817,7 @@ fun MihomoProfileListPage(
             outerPadding = padding,
             isWideScreen = isWideScreen,
         )
-        val listPadding = pageListPadding(contentPadding, bottomExtra = 88.dp)
+        val listPadding = pageListPadding(contentPadding, bottomExtra = 16.dp)
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -827,7 +826,12 @@ fun MihomoProfileListPage(
         ) {
             if (appState.mihomoProfiles.isEmpty()) {
                 item(key = "profile_empty", contentType = "empty") {
-                    MihomoProfileListEmptyState()
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        MihomoProfileListEmptyState()
+                    }
                 }
             } else {
                 items(
@@ -945,30 +949,7 @@ fun MihomoProfileListPage(
 
 @Composable
 private fun MihomoProfileListEmptyState() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 56.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Surface(
-            shape = AsteriskShapeTokens.InnerContainer,
-            color = MaterialTheme.colorScheme.secondaryContainer,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Description,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier.padding(18.dp).size(32.dp),
-            )
-        }
-        Text(
-            text = stringResource(R.string.common_empty),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+    AsteriskEmptyState(title = stringResource(R.string.common_empty))
 }
 
 private data class MihomoProfileContentSignature(
@@ -1025,38 +1006,37 @@ private fun MihomoProfileCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
+                    SmartisanText(
                         text = profile.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = LocalSmartisanTypography.current.listItemPrimary,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = LocalSmartisanColors.current.textPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Text(
+                    SmartisanText(
                         text = profile.summaryText(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.body,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
                 if (syncing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
+                    AsteriskSpinner(
+                        size = 20.dp,
+                        color = LocalSmartisanColors.current.accent,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 Box {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
+                    SmartisanIconButton(onClick = { menuExpanded = true }) {
+                        AsteriskIcon(
+                            res = Icons.Rounded.MoreVert,
                             contentDescription = stringResource(R.string.mihomo_profile_actions),
                         )
                     }
-                    DropdownMenu(
+                    AsteriskPopupMenu(
                         expanded = menuExpanded,
                         onDismissRequest = { menuExpanded = false },
                     ) {
@@ -1108,10 +1088,10 @@ private fun MihomoProfileCard(
                 onRetry = onProviderUsageRetry,
                 onOpenDetails = onOpenProviderDetails,
             )
-            Text(
+            SmartisanText(
                 text = profile.lastUpdatedText(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 10.dp, end = 8.dp),
@@ -1173,9 +1153,9 @@ private fun MihomoProfileMenuItem(
     onAction: (MihomoProfileAction) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    DropdownMenuItem(
-        text = { Text(text) },
-        leadingIcon = { Icon(action.icon(), contentDescription = null) },
+    AsteriskPopupMenuItem(
+        text = { SmartisanText(text) },
+        leadingIcon = { AsteriskIcon(action.icon(), contentDescription = null) },
         onClick = {
             onDismiss()
             onAction(action)
@@ -1183,7 +1163,7 @@ private fun MihomoProfileMenuItem(
     )
 }
 
-private fun MihomoProfileAction.icon(): ImageVector {
+private fun MihomoProfileAction.icon(): Int {
     return when (this) {
         MihomoProfileAction.Edit -> Icons.Rounded.Edit
         MihomoProfileAction.Preview -> Icons.Rounded.Visibility
@@ -1224,27 +1204,27 @@ private fun MihomoProfileImportDialog(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.mihomo_profile_add_method_title),
-                style = MaterialTheme.typography.headlineSmall,
+                style = LocalSmartisanTypography.current.title,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
             MihomoProfileImportOption(
                 title = stringResource(R.string.mihomo_profile_add_qr),
                 summary = stringResource(R.string.mihomo_profile_add_qr_summary),
-                icon = { Icon(imageVector = Icons.Rounded.QrCodeScanner, contentDescription = null) },
+                icon = { AsteriskIcon(res = Icons.Rounded.QrCodeScanner, contentDescription = null) },
                 onClick = { onAction(MihomoProfileImportAction.QrCode) },
             )
             MihomoProfileImportOption(
                 title = stringResource(R.string.mihomo_profile_add_file),
                 summary = stringResource(R.string.mihomo_profile_add_file_summary),
-                icon = { Icon(imageVector = Icons.Rounded.FolderOpen, contentDescription = null) },
+                icon = { AsteriskIcon(res = Icons.Rounded.FolderOpen, contentDescription = null) },
                 onClick = { onAction(MihomoProfileImportAction.File) },
             )
             MihomoProfileImportOption(
                 title = stringResource(R.string.mihomo_profile_add_url),
                 summary = stringResource(R.string.mihomo_profile_add_url_summary),
-                icon = { Icon(imageVector = Icons.Rounded.Link, contentDescription = null) },
+                icon = { AsteriskIcon(res = Icons.Rounded.Link, contentDescription = null) },
                 onClick = { onAction(MihomoProfileImportAction.Url) },
             )
         }
@@ -1258,21 +1238,21 @@ private fun MihomoProfileImportOption(
     icon: @Composable () -> Unit,
     onClick: () -> Unit,
 ) {
-    Surface(
-        onClick = onClick,
+    SmartisanSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 76.dp),
+            .heightIn(min = 76.dp)
+            .smartisanClickable(onClick = onClick),
         shape = AsteriskShapeTokens.InnerContainer,
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
+            SmartisanSurface(
                 shape = AsteriskShapeTokens.SmallContainer,
-                color = MaterialTheme.colorScheme.secondaryContainer,
+                color = LocalSmartisanColors.current.surfaceRaised,
             ) {
                 Box(
                     modifier = Modifier.padding(10.dp),
@@ -1283,18 +1263,18 @@ private fun MihomoProfileImportOption(
             }
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = summary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                     modifier = Modifier.padding(top = 3.dp),
                 )
             }
@@ -1314,21 +1294,19 @@ private fun MihomoProfileSubscriptionInfo(
             .fillMaxWidth()
             .padding(top = 12.dp),
     ) {
-        LinearProgressIndicator(
-            progress = { progress },
+        AsteriskProgressBar(
+            progress =  progress ,
             modifier = Modifier.fillMaxWidth().height(6.dp).padding(end = 8.dp),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.primaryContainer,
         )
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_profile_traffic_summary)
                 .formatTemplate(
                     "used" to info.usedBytes.toReadableBytes(maxUnit = ReadableByteUnit.GiB),
                     "total" to info.totalBytes.toReadableBytes(maxUnit = ReadableByteUnit.GiB),
                     "expire" to info.expireText(),
                 ),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.listItemSecondary,
+            color = LocalSmartisanColors.current.textSecondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 6.dp, end = 8.dp),
@@ -1374,18 +1352,18 @@ private fun MihomoProfilePreviewDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        Card(
+        SmartisanCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 880.dp)
                 .padding(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+            color = LocalSmartisanColors.current.surfaceRaised,
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.mihomo_profile_preview_title)
                         .formatTemplate("name" to profileName.ifBlank { "-" }),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = LocalSmartisanTypography.current.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),

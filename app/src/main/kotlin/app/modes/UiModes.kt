@@ -15,7 +15,7 @@ fun normalizeColorMode(value: Int): Int = when (value) {
     ColorModeThemeLight -> ColorModeLight
     ColorModeThemeDark -> ColorModeDark
     ColorModeSystem, ColorModeLight, ColorModeDark -> value
-    else -> ColorModeSystem
+    else -> ColorModeLight
 }
 
 const val LanguageModeSystem = 0

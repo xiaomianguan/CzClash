@@ -3,6 +3,11 @@
 
 package features.mihomo.provider
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,16 +23,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskProgressBar
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -200,10 +203,10 @@ private fun ProxyProviderStatusCard(
         modifier = modifier,
         status = updated,
         controls = {
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.mihomo_provider_proxy_servers_count)
                     .formatTemplate("count" to state.nodeCount),
-                style = MaterialTheme.typography.titleSmall,
+                style = LocalSmartisanTypography.current.listRowPrimary,
                 fontWeight = FontWeight.SemiBold,
             )
         },
@@ -213,15 +216,15 @@ private fun ProxyProviderStatusCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.CloudSync,
+            AsteriskIcon(
+                res = Icons.Rounded.CloudSync,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = LocalSmartisanColors.current.accent,
             )
-            Text(
+            SmartisanText(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = LocalSmartisanTypography.current.listItemPrimary,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f),
             )
@@ -276,18 +279,18 @@ private fun RuleProviderStatusCard(
         modifier = modifier,
         status = status,
         controls = {
-            Text(
+            SmartisanText(
                 text = pluralStringResource(
                     R.plurals.mihomo_rule_provider_rules_count,
                     ruleCount,
                     ruleCount,
                 ),
-                style = MaterialTheme.typography.titleSmall,
+                style = LocalSmartisanTypography.current.listRowPrimary,
                 fontWeight = FontWeight.SemiBold,
             )
             if (error.isNotBlank() || runtimeIncomplete) {
-                TextButton(onClick = onRetry) {
-                    Text(stringResource(R.string.common_retry))
+                AsteriskLinkButton(onClick = onRetry) {
+                    SmartisanText(stringResource(R.string.common_retry))
                 }
             }
         },
@@ -297,15 +300,15 @@ private fun RuleProviderStatusCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Description,
+            AsteriskIcon(
+                res = Icons.Rounded.Description,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = LocalSmartisanColors.current.accent,
             )
-            Text(
+            SmartisanText(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = LocalSmartisanTypography.current.listItemPrimary,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f),
             )
@@ -337,20 +340,20 @@ private fun MihomoProxyProviderCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         role = ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 14.dp, bottom = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.secondaryContainer,
+            SmartisanSurface(
+                shape = LocalSmartisanShapes.current.large,
+                color = LocalSmartisanColors.current.surfaceRaised,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.CloudSync,
+                AsteriskIcon(
+                    res = Icons.Rounded.CloudSync,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    tint = LocalSmartisanColors.current.textPrimary,
                     modifier = Modifier.padding(12.dp).size(24.dp),
                 )
             }
@@ -358,18 +361,18 @@ private fun MihomoProxyProviderCard(
             Column(
                 modifier = Modifier.weight(1f),
             ) {
-                Text(
+                SmartisanText(
                     text = provider.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = provider.sourceSummary.ifBlank { vehicleText },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -383,10 +386,10 @@ private fun MihomoProxyProviderCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
+                    SmartisanText(
                         text = provider.proxyRuntimeSummaryText(runtimeDetail),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
@@ -396,38 +399,37 @@ private fun MihomoProxyProviderCard(
             }
             Spacer(modifier = Modifier.width(4.dp))
             if (refreshing) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                )
+                AsteriskSpinner(
+                    size = 20.dp,
+                    )
             }
             Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreVert,
+                SmartisanIconButton(onClick = { menuExpanded = true }) {
+                    AsteriskIcon(
+                        res = Icons.Rounded.MoreVert,
                         contentDescription = stringResource(R.string.mihomo_profile_actions),
                     )
                 }
-                DropdownMenu(
+                AsteriskPopupMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.mihomo_profile_preview)) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.mihomo_profile_preview)) },
                         onClick = {
                             menuExpanded = false
                             onAction(MihomoProviderAction.Preview)
                         },
-                        leadingIcon = { Icon(Icons.Rounded.Visibility, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.Visibility, contentDescription = null) },
                     )
                     if (refreshEnabled && !refreshing) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.mihomo_profile_sync)) },
+                        AsteriskPopupMenuItem(
+                            text = { SmartisanText(stringResource(R.string.mihomo_profile_sync)) },
                             onClick = {
                                 menuExpanded = false
                                 onAction(MihomoProviderAction.Sync)
                             },
-                            leadingIcon = { Icon(Icons.Rounded.Sync, contentDescription = null) },
+                            leadingIcon = { AsteriskIcon(Icons.Rounded.Sync, contentDescription = null) },
                         )
                     }
                 }
@@ -477,44 +479,44 @@ private fun MihomoRuleProviderCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         role = ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 14.dp, bottom = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.secondaryContainer,
+            SmartisanSurface(
+                shape = LocalSmartisanShapes.current.large,
+                color = LocalSmartisanColors.current.surfaceRaised,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Description,
+                AsteriskIcon(
+                    res = Icons.Rounded.Description,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    tint = LocalSmartisanColors.current.textPrimary,
                     modifier = Modifier.padding(12.dp).size(24.dp),
                 )
             }
             Spacer(modifier = Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = provider.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = provider.sourceSummary.ifBlank { vehicleText },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = runtimeText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 10.dp),
@@ -534,38 +536,37 @@ private fun MihomoRuleProviderCard(
             }
             Spacer(modifier = Modifier.width(4.dp))
             if (refreshing) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                )
+                AsteriskSpinner(
+                    size = 20.dp,
+                    )
             }
             Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreVert,
+                SmartisanIconButton(onClick = { menuExpanded = true }) {
+                    AsteriskIcon(
+                        res = Icons.Rounded.MoreVert,
                         contentDescription = stringResource(R.string.mihomo_profile_actions),
                     )
                 }
-                DropdownMenu(
+                AsteriskPopupMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.mihomo_profile_preview)) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.mihomo_profile_preview)) },
                         onClick = {
                             menuExpanded = false
                             onAction(MihomoProviderAction.Preview)
                         },
-                        leadingIcon = { Icon(Icons.Rounded.Visibility, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.Visibility, contentDescription = null) },
                     )
                     if (refreshEnabled && !refreshing) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.mihomo_profile_sync)) },
+                        AsteriskPopupMenuItem(
+                            text = { SmartisanText(stringResource(R.string.mihomo_profile_sync)) },
                             onClick = {
                                 menuExpanded = false
                                 onAction(MihomoProviderAction.Sync)
                             },
-                            leadingIcon = { Icon(Icons.Rounded.Sync, contentDescription = null) },
+                            leadingIcon = { AsteriskIcon(Icons.Rounded.Sync, contentDescription = null) },
                         )
                     }
                 }
@@ -590,10 +591,10 @@ internal fun ProviderEmptyState(
             .padding(vertical = 40.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        SmartisanText(
             text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -607,20 +608,20 @@ internal fun ProviderMessageCard(
     AsteriskExpressiveCard(
         modifier = Modifier.fillMaxWidth(),
         role = ExpressiveShapeRole.ContentCard,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = LocalSmartisanColors.current.surface,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
+            SmartisanText(
                 text = text.ifBlank { stringResource(R.string.common_empty) },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.body,
+                color = LocalSmartisanColors.current.textSecondary,
             )
             if (actionText != null && onAction != null) {
-                TextButton(
+                AsteriskLinkButton(
                     onClick = onAction,
                     modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
                 ) {
-                    Text(actionText)
+                    SmartisanText(actionText)
                 }
             }
         }
@@ -646,20 +647,19 @@ private fun MihomoProxyProviderTrafficInfo(
             .fillMaxWidth()
             .padding(top = 12.dp),
     ) {
-        LinearProgressIndicator(
-            progress = { progress },
+        AsteriskProgressBar(
+            progress =  progress ,
             modifier = Modifier.fillMaxWidth().height(6.dp),
-            trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         )
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_profile_traffic_summary)
                 .formatTemplate(
                     "used" to usedBytes.toReadableBytes(maxUnit = ReadableByteUnit.GiB),
                     "total" to info.total.toProviderTrafficTotalText(),
                     "expire" to info.expire.toProviderExpireText(),
                 ),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.listItemSecondary,
+            color = LocalSmartisanColors.current.textSecondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 6.dp),

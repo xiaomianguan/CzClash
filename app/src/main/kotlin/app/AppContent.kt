@@ -3,6 +3,12 @@
 
 package app
 
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.ui.Alignment
+import ui.components.AsteriskBottomBar
+import ui.components.AsteriskBottomBarItem
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,14 +26,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
 import ui.components.AsteriskFloatingNavigationBar
 import ui.components.AsteriskFloatingNavigationItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
@@ -39,7 +42,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -80,7 +82,7 @@ import ui.theme.AsteriskMotion
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import ui.components.AsteriskSpinner
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -105,7 +107,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 private data class MainNavigationItem(
     val destination: MainDestination,
     val label: String,
-    val icon: ImageVector,
+    val icon: Int,
 )
 
 @Composable
@@ -117,10 +119,10 @@ private fun mainNavigationItems(): List<MainNavigationItem> {
 
     return remember(home, proxies, configurations, settings) {
         listOf(
-            MainNavigationItem(MainDestination.Home, home, Icons.Rounded.Home),
-            MainNavigationItem(MainDestination.Proxies, proxies, Icons.AutoMirrored.Rounded.AltRoute),
-            MainNavigationItem(MainDestination.Configurations, configurations, Icons.Rounded.Description),
-            MainNavigationItem(MainDestination.Settings, settings, Icons.Rounded.Settings),
+            MainNavigationItem(MainDestination.Home, home, Icons.Tab.Home),
+            MainNavigationItem(MainDestination.Proxies, proxies, Icons.Tab.Proxies),
+            MainNavigationItem(MainDestination.Configurations, configurations, Icons.Tab.Profiles),
+            MainNavigationItem(MainDestination.Settings, settings, Icons.Tab.Settings),
         )
     }
 }
@@ -156,7 +158,7 @@ fun AppContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(LocalSmartisanColors.current.surface)
                 .imePadding(),
         ) {
             val entryProvider = remember(backStack) {
@@ -264,62 +266,14 @@ private fun Home(
     padding: PaddingValues,
     mainDestinationState: MainDestinationState,
 ) {
-    val isWideScreen = LocalIsWideScreen.current
-    val layoutDirection = LocalLayoutDirection.current
+    // Smartisan uses a single bottom tab bar on every window size, so the wide-screen
+    // navigation rail is intentionally not used.
     val navigationItems = mainNavigationItems()
-    if (isWideScreen) {
-        WideScreenContent(
-            navigationItems = navigationItems,
-            layoutDirection = layoutDirection,
-            mainDestinationState = mainDestinationState,
-        )
-    } else {
-        CompactScreenLayout(
-            navigationItems = navigationItems,
-            padding = padding,
-            mainDestinationState = mainDestinationState,
-        )
-    }
-}
-
-@Composable
-private fun WideScreenContent(
-    navigationItems: List<MainNavigationItem>,
-    layoutDirection: LayoutDirection,
-    mainDestinationState: MainDestinationState,
-) {
-    val selectedDestination = mainDestinationState.current
-    Row {
-        NavigationRail {
-            HomeServicePowerButton(modifier = Modifier.padding(vertical = 12.dp))
-            navigationItems.forEach { item ->
-                NavigationRailItem(
-                    selected = selectedDestination == item.destination,
-                    onClick = { mainDestinationState.select(item.destination) },
-                    icon = { Icon(imageVector = item.icon, contentDescription = null) },
-                    label = { Text(item.label) },
-                )
-            }
-        }
-        AsteriskScaffold(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentWindowInsets =
-                WindowInsets.systemBars.union(
-                    WindowInsets.displayCutout.exclude(
-                        WindowInsets.displayCutout.only(WindowInsetsSides.Start),
-                    ),
-                ),
-        ) { padding ->
-            MainDestinationContent(
-                padding = PaddingValues(top = padding.calculateTopPadding()),
-                mainDestinationState = mainDestinationState,
-                modifier = Modifier
-                    .imePadding()
-                    .padding(end = padding.calculateEndPadding(layoutDirection)),
-            )
-        }
-    }
+    CompactScreenLayout(
+        navigationItems = navigationItems,
+        padding = padding,
+        mainDestinationState = mainDestinationState,
+    )
 }
 
 @Composable
@@ -328,57 +282,32 @@ private fun CompactScreenLayout(
     padding: PaddingValues,
     mainDestinationState: MainDestinationState,
 ) {
-    var isBottomBarVisible by remember { mutableStateOf(true) }
-
-    LaunchedEffect(mainDestinationState.current) {
-        isBottomBarVisible = true
-    }
-
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                if (delta < -10f && isBottomBarVisible) {
-                    isBottomBarVisible = false
-                } else if (delta > 10f && !isBottomBarVisible) {
-                    isBottomBarVisible = true
-                }
-                return Offset.Zero
-            }
-        }
-    }
-
-    val bottomBarOffsetFraction by animateFloatAsState(
-        targetValue = if (isBottomBarVisible) 0f else 1f,
-        animationSpec = AsteriskMotion.spatial(),
-        label = "bottom-bar-visibility-offset",
-    )
-
+    // The Smartisan tab bar is permanent: it never hides on scroll and draws its
+    // background under the (transparent) system navigation bar.
     AsteriskScaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection),
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .graphicsLayer {
-                        translationY = bottomBarOffsetFraction * size.height
-                        alpha = (1f - bottomBarOffsetFraction * 0.85f).coerceIn(0f, 1f)
-                    },
-            ) {
-                MainNavigationBar(
-                    navigationItems = navigationItems,
-                    mainDestinationState = mainDestinationState,
-                )
-            }
+            MainNavigationBar(
+                navigationItems = navigationItems,
+                mainDestinationState = mainDestinationState,
+            )
         },
     ) { innerPadding ->
-        MainDestinationContent(
-            padding = innerPadding,
-            mainDestinationState = mainDestinationState,
-            modifier = Modifier.pageWindowPadding(padding),
-        )
+        Box(Modifier.fillMaxSize()) {
+            val layoutDirection = LocalLayoutDirection.current
+            MainDestinationContent(
+                // The bottom tab bar (in-flow, draws under the nav bar) owns the bottom
+                // inset, so pages must not add the navigation-bar padding again.
+                padding = PaddingValues(
+                    start = padding.calculateStartPadding(layoutDirection),
+                    end = padding.calculateEndPadding(layoutDirection),
+                    top = padding.calculateTopPadding(),
+                    bottom = 0.dp,
+                ),
+                mainDestinationState = mainDestinationState,
+                modifier = Modifier.pageWindowPadding(padding),
+            )
+        }
     }
 }
 
@@ -388,20 +317,20 @@ private fun MainNavigationBar(
     mainDestinationState: MainDestinationState,
     modifier: Modifier = Modifier,
 ) {
-    val selectedDestination = mainDestinationState.current
-    AsteriskFloatingNavigationBar(
+    val selectedIndex = navigationItems
+        .indexOfFirst { it.destination == mainDestinationState.current }
+        .coerceAtLeast(0)
+    AsteriskBottomBar(
+        items = navigationItems.map { item ->
+            AsteriskBottomBarItem(iconRes = item.icon, label = item.label)
+        },
+        selectedIndex = selectedIndex,
+        onSelected = { index ->
+            navigationItems.getOrNull(index)?.let { mainDestinationState.select(it.destination) }
+        },
         modifier = modifier,
-        trailingAction = { HomeServicePowerButton() },
-    ) {
-        navigationItems.forEach { item ->
-            AsteriskFloatingNavigationItem(
-                selected = selectedDestination == item.destination,
-                onClick = { mainDestinationState.select(item.destination) },
-                icon = item.icon,
-                label = item.label,
-            )
-        }
-    }
+        includeNavigationBar = true,
+    )
 }
 
 @Composable
@@ -557,10 +486,10 @@ private fun HomeServicePowerButton(modifier: Modifier = Modifier) {
         },
     ) {
         if (control.serviceOperationInProgress) {
-            CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp)
+            AsteriskSpinner(size = 32.dp, )
         } else {
-            Icon(
-                imageVector = if (appState.proxyRunning) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+            AsteriskIcon(
+                res = if (appState.proxyRunning) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
             )

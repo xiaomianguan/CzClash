@@ -131,32 +131,6 @@
             ]
         },
         {
-            "uniqueId": "org.jetbrains.compose.material:material-icons-extended",
-            "artifactVersion": "1.7.3",
-            "name": "Compose Material Icons Extended",
-            "description": "Compose Material Design extended icons. This module contains all Material icons. It is a very large dependency and should not be included directly.",
-            "website": "https://github.com/JetBrains/compose-jb",
-            "scm": {
-                "url": "https://github.com/JetBrains/compose-jb"
-            },
-            "licenses": [
-                "Apache-2.0"
-            ]
-        },
-        {
-            "uniqueId": "org.jetbrains.compose.material3:material3",
-            "artifactVersion": "1.13.0-alpha02",
-            "name": "Compose Material3 Components",
-            "description": "Compose Material You Design Components library",
-            "website": "https://github.com/JetBrains/compose-multiplatform",
-            "scm": {
-                "url": "https://github.com/JetBrains/compose-multiplatform"
-            },
-            "licenses": [
-                "Apache-2.0"
-            ]
-        },
-        {
             "uniqueId": "org.jetbrains.compose.ui:ui",
             "artifactVersion": "1.12.1",
             "name": "Compose UI",
@@ -164,6 +138,19 @@
             "website": "https://github.com/JetBrains/compose-multiplatform",
             "scm": {
                 "url": "https://github.com/JetBrains/compose-multiplatform"
+            },
+            "licenses": [
+                "Apache-2.0"
+            ]
+        },
+        {
+            "uniqueId": "androidx.core:core-ktx",
+            "artifactVersion": "1.19.1",
+            "name": "Core Kotlin Extensions",
+            "description": "Kotlin extensions for 'core' artifact",
+            "website": "https://developer.android.com/jetpack/androidx/releases/core#1.19.1",
+            "scm": {
+                "url": "https://cs.android.com/androidx/platform/frameworks/support"
             },
             "licenses": [
                 "Apache-2.0"
@@ -196,32 +183,6 @@
             ]
         },
         {
-            "uniqueId": "dev.chrisbanes.haze:haze",
-            "artifactVersion": "2.0.1",
-            "name": "Haze",
-            "description": "Haze",
-            "website": "https://github.com/chrisbanes/haze/",
-            "scm": {
-                "url": "https://github.com/chrisbanes/haze/"
-            },
-            "licenses": [
-                "Apache-2.0"
-            ]
-        },
-        {
-            "uniqueId": "dev.chrisbanes.haze:haze-blur",
-            "artifactVersion": "2.0.1",
-            "name": "Haze Blur",
-            "description": "Haze",
-            "website": "https://github.com/chrisbanes/haze/",
-            "scm": {
-                "url": "https://github.com/chrisbanes/haze/"
-            },
-            "licenses": [
-                "Apache-2.0"
-            ]
-        },
-        {
             "uniqueId": "github:heiher/hev-socks5-tunnel",
             "artifactVersion": "2.18.0",
             "name": "hev-socks5-tunnel",
@@ -232,6 +193,19 @@
             },
             "licenses": [
                 "MIT"
+            ]
+        },
+        {
+            "uniqueId": "androidx.compose:compose-bom",
+            "artifactVersion": "2026.09.00",
+            "name": "Jetpack Compose Libraries BOM",
+            "description": "A compatible set of Jetpack Compose libraries.",
+            "website": "https://developer.android.com/jetpack",
+            "scm": {
+                "url": "https://developer.android.com/jetpack"
+            },
+            "licenses": [
+                "Apache-2.0"
             ]
         },
         {
@@ -313,19 +287,6 @@
             ]
         },
         {
-            "uniqueId": "com.materialkolor:material-kolor",
-            "artifactVersion": "5.0.1",
-            "name": "MaterialKolor",
-            "description": "Material You dynamic color for Compose Multiplatform",
-            "website": "https://github.com/jordond/materialkolor",
-            "scm": {
-                "url": "https://github.com/jordond/materialkolor"
-            },
-            "licenses": [
-                "MIT"
-            ]
-        },
-        {
             "uniqueId": "github:MetaCubeX/mihomo",
             "artifactVersion": null,
             "name": "Mihomo",
@@ -372,6 +333,19 @@
             "website": "https://developer.android.com/jetpack/androidx/releases/room#2.8.5",
             "scm": {
                 "url": "https://cs.android.com/androidx/platform/frameworks/support"
+            },
+            "licenses": [
+                "Apache-2.0"
+            ]
+        },
+        {
+            "uniqueId": "github:xiaomianguan/smartisanx",
+            "artifactVersion": null,
+            "name": "smartisanx",
+            "description": "Smartisan OS (\u9524\u5b50) style Jetpack Compose component library used for this app's entire UI.",
+            "website": "https://github.com/xiaomianguan/smartisanx",
+            "scm": {
+                "url": "https://github.com/xiaomianguan/smartisanx"
             },
             "licenses": [
                 "Apache-2.0"

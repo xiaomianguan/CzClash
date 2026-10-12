@@ -3,63 +3,66 @@
 
 package ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import cc.wuersan008.smartisanx.ui.layout.SmartisanSectionTitle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ui.theme.AsteriskShapeTokens
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.ui.layout.SmartisanListItem
+
+private val EmptyTrailingContent: @Composable RowScope.() -> Unit = {}
+private val EmptySectionAction: @Composable RowScope.() -> Unit = {}
 
 @Composable
 internal fun AsteriskSection(
     modifier: Modifier = Modifier,
     title: String? = null,
-    action: @Composable RowScope.() -> Unit = {},
+    action: @Composable RowScope.() -> Unit = EmptySectionAction,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val colors = LocalSmartisanColors.current
+    val typography = LocalSmartisanTypography.current
     Column(modifier = modifier) {
         if (title != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, top = 12.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = title,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                action()
+            if (action === EmptySectionAction) {
+                // Library group title (grey, canonical rhythm).
+                SmartisanSectionTitle(text = title)
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 18.dp, end = 18.dp, top = 19.5.dp, bottom = 5.5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SmartisanText(
+                        text = title,
+                        modifier = Modifier.weight(1f),
+                        style = typography.sectionTitle,
+                        color = colors.textTertiary,
+                        maxLines = 1,
+                    )
+                    action()
+                }
             }
         }
-        AsteriskPageCard(modifier = Modifier.fillMaxWidth()) {
-            Column(content = content)
-        }
+        SmartisanGroup(position = SmartisanGroupRowPosition.Single) { Column(content = content) }
     }
 }
 
@@ -69,82 +72,54 @@ internal fun AsteriskListRow(
     modifier: Modifier = Modifier,
     summary: String? = null,
     status: String? = null,
-    leadingIcon: ImageVector? = null,
+    leadingIcon: Int? = null,
     leadingContentDescription: String? = null,
     enabled: Boolean = true,
     selected: Boolean? = null,
     role: Role? = null,
     onClick: (() -> Unit)? = null,
     horizontalPadding: Dp = 16.dp,
-    trailingContent: @Composable RowScope.() -> Unit = {},
+    trailingContent: @Composable RowScope.() -> Unit = EmptyTrailingContent,
 ) {
-    val selectionModifier = if (selected == null) {
-        Modifier
-    } else {
-        Modifier.semantics { this.selected = selected }
-    }
-    val clickModifier = if (onClick == null) {
-        Modifier
-    } else {
-        Modifier.clickable(enabled = enabled, role = role, onClick = onClick)
-    }
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .then(selectionModifier)
-            .then(clickModifier)
-            .padding(horizontal = horizontalPadding, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (leadingIcon != null) {
-            Surface(
-                shape = AsteriskShapeTokens.SmallContainer,
-                color = if (selected == true) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainerHigh
-                },
-            ) {
-                Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = leadingIcon,
-                        contentDescription = leadingContentDescription,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
-            }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = if (selected == true) FontWeight.SemiBold else FontWeight.Normal,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            if (summary != null) {
-                Text(
-                    text = summary,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+    val colors = LocalSmartisanColors.current
+    val typography = LocalSmartisanTypography.current
+    val hasTrailing = status != null || trailingContent !== EmptyTrailingContent
+    SmartisanListItem(
+        title = title,
+        modifier = modifier,
+        summary = summary,
+        leading = leadingIcon?.let { icon ->
+            {
+                AsteriskIcon(
+                    res = icon,
+                    contentDescription = leadingContentDescription,
+                    tint = if (selected == true) colors.accent else colors.textSecondary,
+                    size = 24.dp,
                 )
             }
-        }
-        if (status != null) {
-            Text(
-                text = status,
-                modifier = Modifier.width(88.dp),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        trailingContent()
-    }
+        },
+        trailing = if (hasTrailing) {
+            {
+                if (status != null) {
+                    SmartisanText(
+                        text = status,
+                        modifier = Modifier.width(88.dp),
+                        style = typography.listItemSecondary,
+                        color = colors.textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    trailingContent()
+                }
+            }
+        } else {
+            null
+        },
+        enabled = enabled,
+        selected = selected == true,
+        contentPadding = horizontalPadding,
+        onClick = onClick,
+    )
 }

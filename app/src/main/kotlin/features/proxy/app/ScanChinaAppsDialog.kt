@@ -3,6 +3,8 @@
 
 package features.proxy.app
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,11 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import ui.components.AsteriskProgressBar
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialogButton
+import ui.components.AsteriskModalDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,16 +48,20 @@ internal fun ScanChinaAppsDialog(
         previousSize = progress.matched.size
     }
 
-    AlertDialog(
+    AsteriskModalDialog(
+        title = stringResource(R.string.proxy_app_list_scan_china_apps),
         onDismissRequest = {},
-        confirmButton = {
-            TextButton(onClick = onCancel) {
-                Text(stringResource(R.string.common_cancel))
-            }
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
+        buttons = {
+            SmartisanDialogButton(
+                text = stringResource(R.string.common_cancel),
+                onClick = onCancel,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                accent = false,
+            )
         },
-        title = { Text(stringResource(R.string.proxy_app_list_scan_china_apps)) },
-        text = {
-            Column(
+    ) {
+        Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(360.dp)
@@ -66,10 +73,10 @@ internal fun ScanChinaAppsDialog(
                     progress.total,
                     progress.matched.size,
                 )
-                Text(
+                SmartisanText(
                     text = progressText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
                 Spacer(Modifier.height(8.dp))
                 val ratio = if (progress.total > 0) {
@@ -77,8 +84,8 @@ internal fun ScanChinaAppsDialog(
                 } else {
                     0f
                 }
-                LinearProgressIndicator(
-                    progress = { ratio.coerceIn(0f, 1f) },
+                AsteriskProgressBar(
+                    progress =  ratio.coerceIn(0f, 1f) ,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 12.dp),
@@ -88,10 +95,10 @@ internal fun ScanChinaAppsDialog(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
+                        SmartisanText(
                             text = stringResource(R.string.common_empty),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                     }
                 } else {
@@ -103,16 +110,15 @@ internal fun ScanChinaAppsDialog(
                             items = progress.matched,
                             key = { item -> item.key },
                         ) { item ->
-                            Text(
+                            SmartisanText(
                                 text = "${item.label} (${item.packageName})",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = LocalSmartisanTypography.current.body,
                                 modifier = Modifier.padding(vertical = 4.dp),
                             )
                         }
                     }
                 }
             }
-        },
-    )
+        }
 }
 

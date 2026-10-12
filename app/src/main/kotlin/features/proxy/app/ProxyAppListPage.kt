@@ -3,6 +3,9 @@
 
 package features.proxy.app
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.content.pm.PackageManager
 import android.os.SystemClock
 import androidx.compose.foundation.background
@@ -23,13 +26,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialogButton
+import ui.components.AsteriskModalDialog
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -463,22 +468,23 @@ fun ProxyAppListPage(
     )
 
     if (showHelpDialog) {
-        AlertDialog(
+        AsteriskModalDialog(
+            title = stringResource(R.string.proxy_app_list_help_title),
             onDismissRequest = { showHelpDialog = false },
-            title = { Text(stringResource(R.string.proxy_app_list_help_title)) },
-            text = {
-                Column {
-                    Text(stringResource(R.string.proxy_app_list_help_blacklist))
-                    Text(stringResource(R.string.proxy_app_list_help_global))
-                    Text(stringResource(R.string.proxy_app_list_help_whitelist))
-                }
+            buttons = {
+                SmartisanDialogButton(
+                    text = stringResource(R.string.common_close),
+                    onClick = { showHelpDialog = false },
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                )
             },
-            confirmButton = {
-                TextButton(onClick = { showHelpDialog = false }) {
-                    Text(stringResource(R.string.common_close))
-                }
-            },
-        )
+        ) {
+            Column(Modifier.fillMaxWidth()) {
+                SmartisanText(stringResource(R.string.proxy_app_list_help_blacklist))
+                SmartisanText(stringResource(R.string.proxy_app_list_help_global))
+                SmartisanText(stringResource(R.string.proxy_app_list_help_whitelist))
+            }
+        }
     }
 }
 
@@ -494,12 +500,12 @@ private fun ProxyAppListTopBar(
         query = searchValue,
         onQueryChange = onSearchValueChange,
         placeholder = stringResource(R.string.proxy_app_list_search_label),
-        title = { Text(stringResource(R.string.proxy_app_list_title)) },
+        title = { SmartisanText(stringResource(R.string.proxy_app_list_title)) },
         navigationIcon = {
             onBack?.let { navigateBack ->
-                IconButton(onClick = navigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                SmartisanIconButton(onClick = navigateBack) {
+                    AsteriskIcon(
+                        res = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = stringResource(R.string.common_back),
                     )
                 }
@@ -606,20 +612,19 @@ private fun ProxyAppListLoadingState(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.background(MaterialTheme.colorScheme.background),
+        modifier = modifier.background(LocalSmartisanColors.current.pageBackground),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(28.dp),
-            color = MaterialTheme.colorScheme.primary,
-            strokeWidth = 2.5.dp,
-        )
+        AsteriskSpinner(
+            size = 28.dp,
+            color = LocalSmartisanColors.current.accent,
+            )
         Spacer(Modifier.height(14.dp))
-        Text(
+        SmartisanText(
             text = stringResource(R.string.proxy_app_list_loading),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }

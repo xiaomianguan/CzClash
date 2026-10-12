@@ -11,16 +11,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialExpressiveTheme
-import androidx.compose.material3.MotionScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -31,13 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.graphics.drawable.toDrawable
@@ -47,13 +32,12 @@ import app.modes.ColorModeDark
 import app.modes.ColorModeLight
 import app.modes.ColorModeSystem
 import app.modes.normalizeColorMode
-import com.materialkolor.PaletteStyle
-import com.materialkolor.dynamiccolor.ColorSpec
-import com.materialkolor.rememberDynamicColorScheme
-import ui.theme.AsteriskMotion
-import ui.theme.AsteriskShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.SmartisanColors
+import cc.wuersan008.smartisanx.core.theme.SmartisanTheme
+import cc.wuersan008.smartisanx.core.theme.darkSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.lightSmartisanColors
 import ui.theme.AsteriskSpacing
-import ui.theme.AsteriskTypography
 import ui.theme.LocalReduceMotion
 import ui.theme.LocalSpacing
 import ui.theme.resolveTheme
@@ -61,12 +45,19 @@ import ui.theme.resolveTheme
 val LocalColorMode = compositionLocalOf { ColorModeSystem }
 private val LocalResolvedDarkTheme = compositionLocalOf { false }
 
-private const val ThemeSchemeSwitchFraction = 0.35f
-private const val ThemeTransitionMaxAlpha = 0.12f
+/** Standard Smartisan selection/accent blue. */
+private val SmartisanAccentBlue = Color(0xFF3D70EF)
 
+/**
+ * Application theme entry point.
+ *
+ * Everything is rendered with the Smartisan (锤子) design language from the vendored
+ * `smartisanx` library: [SmartisanTheme] provides the palette, typography (including the
+ * original Smartisan Compact CNS font) and shapes that every component reads directly.
+ */
 @Composable
 fun AppTheme(
-    colorMode: Int = ColorModeSystem,
+    colorMode: Int = ColorModeLight,
     keyColor: Color? = null,
     systemDark: Boolean,
     content: @Composable () -> Unit,
@@ -79,7 +70,6 @@ fun AppTheme(
         hasCustomSeed = keyColor != null,
     )
     val context = LocalContext.current
-    val configuration = LocalConfiguration.current
     var animationsEnabled by remember(context) {
         mutableStateOf(systemAnimationsEnabled())
     }
@@ -96,94 +86,63 @@ fun AppTheme(
         )
         onDispose { context.contentResolver.unregisterContentObserver(observer) }
     }
-    val themeTransitionMotion = AsteriskMotion.effects<Float>(reducedMotion = !animationsEnabled)
-    val fallbackSeed = if (resolution.usesCustomSeed) keyColor!! else DefaultSeedColor
-    val fallbackScheme = rememberDynamicColorScheme(
-        seedColor = fallbackSeed,
-        isDark = resolution.isDark,
-        style = PaletteStyle.TonalSpot,
-        specVersion = ColorSpec.SpecVersion.SPEC_2025,
-    )
-    val systemDynamicScheme = if (
-        resolution.usesSystemDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    ) {
-        remember(context, configuration, resolution.isDark) {
-            if (resolution.isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-    } else {
-        null
-    }
-    val baseScheme = systemDynamicScheme ?: fallbackScheme
-    val materialScheme = baseScheme.copy(
-        background = if (resolution.isDark) {
-            lerp(baseScheme.background, Color.Black, 0.1f)
-        } else {
-            lerp(baseScheme.background, Color.White, 0.3f)
-        },
-    )
-    var displayedScheme by remember { mutableStateOf(materialScheme) }
-    var displayedIsDark by remember { mutableStateOf(resolution.isDark) }
-    var systemBarIsDark by remember { mutableStateOf(resolution.isDark) }
-    var transitionActive by remember { mutableStateOf(false) }
-    var transitionStartTint by remember { mutableStateOf(materialScheme.primaryContainer) }
-    var transitionEndTint by remember { mutableStateOf(materialScheme.primaryContainer) }
-    val transitionProgress = remember { Animatable(1f) }
 
-    LaunchedEffect(materialScheme, resolution.isDark) {
-        if (displayedScheme === materialScheme && displayedIsDark == resolution.isDark) {
-            transitionProgress.snapTo(1f)
-            transitionActive = false
-            systemBarIsDark = resolution.isDark
-            return@LaunchedEffect
-        }
+    val baseColors = if (resolution.isDark) darkSmartisanColors() else lightSmartisanColors()
+    val smartisanColors = baseColors.withAccentOverride(SmartisanAccentBlue)
 
-        transitionProgress.snapTo(0f)
-        transitionStartTint = displayedScheme.primaryContainer
-        transitionEndTint = materialScheme.primaryContainer
-        transitionActive = true
-
-        withFrameNanos { }
-        var targetApplied = false
-        transitionProgress.animateTo(
-            targetValue = 1f,
-            animationSpec = themeTransitionMotion,
+    SmartisanTheme(colors = smartisanColors) {
+        val colors = LocalSmartisanColors.current
+        CompositionLocalProvider(
+            LocalColorMode provides colorMode,
+            LocalResolvedDarkTheme provides resolution.isDark,
+            LocalReduceMotion provides !animationsEnabled,
+            LocalSpacing provides AsteriskSpacing(),
         ) {
-            if (!targetApplied && value >= ThemeSchemeSwitchFraction) {
-                displayedScheme = materialScheme
-                displayedIsDark = resolution.isDark
-                systemBarIsDark = resolution.isDark
-                targetApplied = true
-            }
+            SystemBarAppearance(
+                backgroundColor = colors.pageBackground,
+                isDark = resolution.isDark,
+            )
+            content()
         }
-        if (!targetApplied) {
-            displayedScheme = materialScheme
-            displayedIsDark = resolution.isDark
-            systemBarIsDark = resolution.isDark
-        }
-        transitionActive = false
     }
+}
 
-    CompositionLocalProvider(
-        LocalColorMode provides colorMode,
-        LocalResolvedDarkTheme provides displayedIsDark,
-        LocalReduceMotion provides !animationsEnabled,
-    ) {
-        CompositionLocalProvider(LocalSpacing provides AsteriskSpacing()) {
-            AsteriskMaterialTheme(colorScheme = displayedScheme) {
-                SystemBarAppearance(
-                    colorScheme = displayedScheme,
-                    isDark = systemBarIsDark,
-                )
-                ThemeTransitionOverlay(
-                    transitionActive = transitionActive,
-                    transitionProgress = transitionProgress,
-                    startTint = transitionStartTint,
-                    endTint = transitionEndTint,
-                    content = content,
-                )
-            }
-        }
-    }
+/** Applies the user-selected seed colour as the Smartisan accent (or keeps the default). */
+private fun SmartisanColors.withAccentOverride(accent: Color?): SmartisanColors {
+    if (accent == null) return this
+    return SmartisanColors(
+        pageBackground = pageBackground,
+        surface = surface,
+        surfaceRaised = surfaceRaised,
+        surfacePressed = surfacePressed,
+        surfaceDisabled = surfaceDisabled,
+        titleBarBackground = titleBarBackground,
+        divider = divider,
+        rowDivider = rowDivider,
+        textPrimary = textPrimary,
+        textSecondary = textSecondary,
+        textTertiary = textTertiary,
+        textDisabled = textDisabled,
+        textHint = textHint,
+        accent = accent,
+        accentPressed = accent,
+        accentDisabled = accent.copy(alpha = 0.4f),
+        onAccent = onAccent,
+        link = link,
+        linkPressed = linkPressed,
+        success = success,
+        warning = warning,
+        selectionBackground = selectionBackground,
+        pressedHighlight = pressedHighlight,
+        onPressedHighlight = onPressedHighlight,
+        switchTrack = switchTrack,
+        switchTrackStroke = switchTrackStroke,
+        switchKnob = switchKnob,
+        switchIndicator = switchIndicator,
+        scrollbarThumb = scrollbarThumb,
+        scrim = scrim,
+        isLight = isLight,
+    )
 }
 
 @Composable
@@ -204,53 +163,6 @@ private fun SynchronizeSplashTheme(colorMode: Int) {
 private fun systemAnimationsEnabled(): Boolean = ValueAnimator.areAnimatorsEnabled()
 
 @Composable
-private fun AsteriskMaterialTheme(
-    colorScheme: ColorScheme,
-    content: @Composable () -> Unit,
-) {
-    MaterialExpressiveTheme(
-        colorScheme = colorScheme,
-        motionScheme = MotionScheme.expressive(),
-        shapes = AsteriskShapes,
-        typography = AsteriskTypography,
-        content = content,
-    )
-}
-
-@Composable
-private fun ThemeTransitionOverlay(
-    transitionActive: Boolean,
-    transitionProgress: Animatable<Float, AnimationVector1D>,
-    startTint: Color,
-    endTint: Color,
-    content: @Composable () -> Unit,
-) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        content()
-        if (transitionActive) {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawWithCache {
-                        onDrawBehind {
-                            val progress = transitionProgress.value.coerceIn(0f, 1f)
-                            val intensity = if (progress <= ThemeSchemeSwitchFraction) {
-                                progress / ThemeSchemeSwitchFraction
-                            } else {
-                                (1f - progress) / (1f - ThemeSchemeSwitchFraction)
-                            }
-                            drawRect(
-                                color = lerp(startTint, endTint, progress),
-                                alpha = intensity.coerceIn(0f, 1f) * ThemeTransitionMaxAlpha,
-                            )
-                        }
-                    },
-            )
-        }
-    }
-}
-
-@Composable
 fun isInDarkTheme(): Boolean = LocalResolvedDarkTheme.current
 
 val KeyColors: List<Color> = listOf(
@@ -266,18 +178,16 @@ val KeyColors: List<Color> = listOf(
 
 fun keyColorFor(index: Int): Color? = if (index <= 0) null else KeyColors.getOrNull(index - 1)
 
-private val DefaultSeedColor = Color(0xFF6750A4)
-
 @Composable
 private fun SystemBarAppearance(
-    colorScheme: ColorScheme,
+    backgroundColor: Color,
     isDark: Boolean,
 ) {
     val view = LocalView.current
     if (view.isInEditMode) return
     SideEffect {
         val window = (view.context as? Activity)?.window ?: return@SideEffect
-        window.setBackgroundDrawable(colorScheme.surface.toArgb().toDrawable())
+        window.setBackgroundDrawable(backgroundColor.toArgb().toDrawable())
         WindowCompat.getInsetsController(window, view).apply {
             isAppearanceLightStatusBars = !isDark
             isAppearanceLightNavigationBars = !isDark

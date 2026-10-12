@@ -3,6 +3,13 @@
 
 package features.mihomo
 
+import ui.components.AsteriskIcon
+import ui.components.AsteriskStateField
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import ui.layout.codeEditorShowsSupportingContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -14,6 +21,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -27,19 +35,19 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.byValue
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import ui.components.AsteriskModalDialog
+import cc.wuersan008.smartisanx.ui.basic.SmartisanDivider
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskProgressBar
+
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import cc.wuersan008.smartisanx.ui.control.SmartisanSwitch
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanConfirmDialog
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialog
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialogButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import ui.components.AsteriskTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -504,26 +512,26 @@ fun MihomoProfileEditPage(
     AsteriskScaffold(
         topBar = {
             AsteriskTopAppBar(
-                title = { Text(title, maxLines = 1) },
+                title = { SmartisanText(title, maxLines = 1) },
                 navigationIcon = {
-                    IconButton(
+                    SmartisanIconButton(
                         onClick = { navigator.pop() },
                         enabled = !saving,
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        AsteriskIcon(
+                            res = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.common_back),
                         )
                     }
                 },
                 actions = {
-                    TextButton(
+                    AsteriskLinkButton(
                         onClick = ::onSave,
                         enabled = !saving && (profileType != MihomoProfileType.Url || updateIntervalValid),
                     ) {
-                        Icon(Icons.Rounded.Save, contentDescription = null)
+                        AsteriskIcon(Icons.Rounded.Save, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.common_save))
+                        SmartisanText(stringResource(R.string.common_save))
                     }
                 },
             )
@@ -543,10 +551,10 @@ fun MihomoProfileEditPage(
                     .padding(horizontal = 12.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.mihomo_profile_missing),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.body,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
         } else {
@@ -564,11 +572,11 @@ fun MihomoProfileEditPage(
                         .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 12.dp),
                 ) {
                     if (profileType == MihomoProfileType.Url) {
-                        OutlinedTextField(
+                        AsteriskStateField(
                             shape = AsteriskShapeTokens.InnerContainer,
                             state = nameState,
                             enabled = !saving,
-                            label = { Text(stringResource(R.string.mihomo_profile_name)) },
+                            label = { SmartisanText(stringResource(R.string.mihomo_profile_name)) },
                             lineLimits = TextFieldLineLimits.SingleLine,
                             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         )
@@ -608,39 +616,40 @@ fun MihomoProfileEditPage(
                             exit = AsteriskMotion.contentExit(),
                         ) {
                             Column {
-                                Surface(
-                                    onClick = { showFileProperties = true },
-                                    enabled = !saving,
-                                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                                    shape = MaterialTheme.shapes.large,
-                                    color = MaterialTheme.colorScheme.surfaceContainer,
+                                SmartisanSurface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 12.dp)
+                                        .smartisanClickable(enabled = !saving) { showFileProperties = true },
+                                    shape = LocalSmartisanShapes.current.large,
+                                    color = LocalSmartisanColors.current.surface,
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Tune,
+                                        AsteriskIcon(
+                                            res = Icons.Rounded.Tune,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
+                                            tint = LocalSmartisanColors.current.accent,
                                         )
                                         Spacer(Modifier.width(14.dp))
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text(
+                                            SmartisanText(
                                                 text = stringResource(R.string.mihomo_profile_properties),
-                                                style = MaterialTheme.typography.titleMedium,
+                                                style = LocalSmartisanTypography.current.listItemPrimary,
                                             )
-                                            Text(
+                                            SmartisanText(
                                                 text = nameState.text.toString().ifBlank {
                                                     stringResource(R.string.mihomo_profile_name)
                                                 },
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                style = LocalSmartisanTypography.current.body,
+                                                color = LocalSmartisanColors.current.textSecondary,
                                                 maxLines = 1,
                                             )
                                         }
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                        AsteriskIcon(
+                                            res = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                             contentDescription = null,
                                         )
                                     }
@@ -741,51 +750,43 @@ internal fun MihomoProfileSyncProgressDialog(
             MihomoProfileSyncStage.Verifying -> R.string.mihomo_profile_save_sync_verifying
         },
     )
-    AlertDialog(
+    AsteriskModalDialog(
+        title = title ?: stringResource(R.string.mihomo_profile_save_sync_in_progress_title),
         onDismissRequest = {},
-        icon = {
-            CircularProgressIndicator(
-                modifier = Modifier.size(36.dp),
-                strokeWidth = 3.dp,
-            )
-        },
-        title = {
-            Text(title ?: stringResource(R.string.mihomo_profile_save_sync_in_progress_title))
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                profileName?.let { name ->
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.titleSmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Text(message)
-                progress?.let { value ->
-                    LinearProgressIndicator(
-                        progress = { value.coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                progressLabel?.let { label ->
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            AsteriskActionButton(
+        buttons = {
+            SmartisanDialogButton(
                 text = stringResource(R.string.common_cancel),
-                icon = Icons.Rounded.Close,
                 onClick = onCancel,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                accent = false,
             )
         },
-    )
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            profileName?.let { name ->
+                SmartisanText(
+                    text = name,
+                    style = LocalSmartisanTypography.current.listRowPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            SmartisanText(message)
+            progress?.let { value ->
+                AsteriskProgressBar(
+                    progress =  value.coerceIn(0f, 1f) ,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            progressLabel?.let { label ->
+                SmartisanText(
+                    text = label,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -806,35 +807,34 @@ internal fun MihomoProfileSyncFailureDialog(
     val detail = failure.error.localizedMessage
         ?.takeIf(String::isNotBlank)
         ?: failure.error::class.java.simpleName
-    AlertDialog(
+    AsteriskModalDialog(
+        title = stringResource(R.string.mihomo_profile_save_sync_failed_title),
         onDismissRequest = onCancel,
-        icon = { Icon(Icons.Rounded.Warning, contentDescription = null) },
-        title = { Text(stringResource(R.string.mihomo_profile_save_sync_failed_title)) },
-        text = {
-            Text(stringResource(R.string.mihomo_profile_save_sync_failed_message, stage, detail))
-        },
-        dismissButton = {
-            Row {
-                AsteriskActionButton(
-                    text = stringResource(R.string.common_cancel),
-                    icon = Icons.Rounded.Close,
-                    onClick = onCancel,
-                )
-                AsteriskActionButton(
-                    text = stringResource(R.string.mihomo_profile_save_anyway),
-                    icon = Icons.Rounded.Save,
-                    onClick = onSaveAnyway,
-                )
-            }
-        },
-        confirmButton = {
-            AsteriskActionButton(
+        buttons = {
+            SmartisanDialogButton(
+                text = stringResource(R.string.common_cancel),
+                onClick = onCancel,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                accent = false,
+            )
+            SmartisanDialogButton(
+                text = stringResource(R.string.mihomo_profile_save_anyway),
+                onClick = onSaveAnyway,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                accent = false,
+            )
+            SmartisanDialogButton(
                 text = stringResource(R.string.common_retry),
-                icon = Icons.Rounded.Refresh,
                 onClick = onRetry,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         },
-    )
+    ) {
+        SmartisanText(
+            text = stringResource(R.string.mihomo_profile_save_sync_failed_message, stage, detail),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @Composable
@@ -845,28 +845,19 @@ internal fun RestartRequiredDialog(
     onLater: () -> Unit,
 ) {
     if (!show) return
-    AlertDialog(
+    SmartisanDialog(
         onDismissRequest = { if (!restarting) onLater() },
-        icon = { Icon(Icons.Rounded.Tune, contentDescription = null) },
-        title = { Text(stringResource(R.string.mihomo_profile_restart_required)) },
-        text = { Text(stringResource(R.string.mihomo_profile_restart_required_message)) },
-        dismissButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.mihomo_profile_restart_later),
-                icon = Icons.Rounded.History,
-                onClick = onLater,
-                enabled = !restarting,
-            )
-        },
-        confirmButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.mihomo_profile_restart_now),
-                icon = Icons.Rounded.Refresh,
-                onClick = onRestartNow,
-                enabled = !restarting,
-            )
-        },
-    )
+        title = stringResource(R.string.mihomo_profile_restart_required),
+        confirmText = stringResource(R.string.mihomo_profile_restart_now),
+        dismissText = stringResource(R.string.mihomo_profile_restart_later),
+        confirmEnabled = !restarting,
+        onConfirm = onRestartNow,
+    ) {
+        SmartisanText(
+            text = stringResource(R.string.mihomo_profile_restart_required_message),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @Composable
@@ -876,24 +867,13 @@ private fun HttpSubscriptionWarningDialog(
     onConfirm: () -> Unit,
 ) {
     if (!show) return
-    AlertDialog(
+    SmartisanConfirmDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.mihomo_profile_http_subscription_warning_title)) },
-        text = { Text(stringResource(R.string.mihomo_profile_http_subscription_warning_message)) },
-        dismissButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.common_cancel),
-                icon = Icons.Rounded.Close,
-                onClick = onDismissRequest,
-            )
-        },
-        confirmButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.mihomo_profile_http_subscription_warning_confirm),
-                icon = Icons.Rounded.Check,
-                onClick = onConfirm,
-            )
-        },
+        title = stringResource(R.string.mihomo_profile_http_subscription_warning_title),
+        message = stringResource(R.string.mihomo_profile_http_subscription_warning_message),
+        confirmText = stringResource(R.string.mihomo_profile_http_subscription_warning_confirm),
+        dismissText = stringResource(R.string.common_cancel),
+        onConfirm = onConfirm,
     )
 }
 
@@ -918,19 +898,19 @@ private fun ColumnScope.UrlProfileFields(
     runMode: Int,
     onDisableOverridesChange: (Boolean) -> Unit,
 ) {
-    OutlinedTextField(
+    AsteriskStateField(
         shape = AsteriskShapeTokens.InnerContainer,
         state = urlState,
         enabled = enabled,
-        label = { Text(stringResource(R.string.mihomo_profile_url)) },
+        label = { SmartisanText(stringResource(R.string.mihomo_profile_url)) },
         lineLimits = TextFieldLineLimits.SingleLine,
         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
     )
-    OutlinedTextField(
+    AsteriskStateField(
         shape = AsteriskShapeTokens.InnerContainer,
         state = updateIntervalState,
         enabled = enabled,
-        label = { Text(stringResource(R.string.mihomo_profile_update_interval)) },
+        label = { SmartisanText(stringResource(R.string.mihomo_profile_update_interval)) },
         lineLimits = TextFieldLineLimits.SingleLine,
         inputTransformation = InputTransformation.byValue { _, proposed ->
             sanitizeSubscriptionIntervalInput(proposed.toString())
@@ -941,35 +921,35 @@ private fun ColumnScope.UrlProfileFields(
         ),
         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
     )
-    Surface(
+    SmartisanSurface(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = LocalSmartisanShapes.current.large,
+        color = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.mihomo_profile_update_via_proxy),
-                style = MaterialTheme.typography.bodyLarge,
+                style = LocalSmartisanTypography.current.body,
                 modifier = Modifier.weight(1f),
             )
-            Switch(
+            SmartisanSwitch(
                 checked = updateViaProxy,
                 onCheckedChange = onUpdateViaProxyChange,
                 enabled = enabled,
             )
         }
     }
-    TextButton(
+    AsteriskLinkButton(
         onClick = { onAdvancedExpandedChange(!advancedExpanded) },
         enabled = enabled,
         modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
     ) {
         AsteriskExpansionIndicator(expanded = advancedExpanded)
         Spacer(Modifier.width(8.dp))
-        Text(stringResource(R.string.settings_advanced))
+        SmartisanText(stringResource(R.string.settings_advanced))
     }
     AnimatedVisibility(
         visible = advancedExpanded,
@@ -977,27 +957,27 @@ private fun ColumnScope.UrlProfileFields(
         exit = AsteriskMotion.contentExit(),
     ) {
         Column {
-            OutlinedTextField(
+            AsteriskStateField(
                 shape = AsteriskShapeTokens.InnerContainer,
                 state = userAgentState,
                 enabled = enabled,
-                label = { Text(stringResource(R.string.mihomo_profile_user_agent)) },
+                label = { SmartisanText(stringResource(R.string.mihomo_profile_user_agent)) },
                 lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             )
-            OutlinedTextField(
+            AsteriskStateField(
                 shape = AsteriskShapeTokens.InnerContainer,
                 state = ageSecretKeyState,
                 enabled = enabled,
-                label = { Text(stringResource(R.string.mihomo_profile_age_secret_key)) },
+                label = { SmartisanText(stringResource(R.string.mihomo_profile_age_secret_key)) },
                 lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             )
-            OutlinedTextField(
+            AsteriskStateField(
                 shape = AsteriskShapeTokens.InnerContainer,
                 state = hwidState,
                 enabled = enabled,
-                label = { Text(stringResource(R.string.subscription_hwid)) },
+                label = { SmartisanText(stringResource(R.string.subscription_hwid)) },
                 lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             )
@@ -1051,20 +1031,20 @@ private fun FileProfilePropertiesSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 24.dp),
         ) {
-            OutlinedTextField(
+            AsteriskStateField(
                 shape = AsteriskShapeTokens.InnerContainer,
                 state = nameState,
-                label = { Text(stringResource(R.string.mihomo_profile_name)) },
+                label = { SmartisanText(stringResource(R.string.mihomo_profile_name)) },
                 lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             )
-            TextButton(
+            AsteriskLinkButton(
                 onClick = { advancedExpanded = !advancedExpanded },
                 modifier = Modifier.align(Alignment.End),
             ) {
                 AsteriskExpansionIndicator(expanded = advancedExpanded)
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.settings_advanced))
+                SmartisanText(stringResource(R.string.settings_advanced))
             }
             AnimatedVisibility(
                 visible = advancedExpanded,
@@ -1126,28 +1106,28 @@ private fun RawConfigModeControl(
     runMode: Int,
     onEnabledChange: (Boolean) -> Unit,
 ) {
-    Surface(
+    SmartisanSurface(
         modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-        shape = MaterialTheme.shapes.large,
-        color = if (enabled) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+        shape = LocalSmartisanShapes.current.large,
+        color = if (enabled) LocalSmartisanColors.current.surfaceRaised else LocalSmartisanColors.current.surface,
     ) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profile_raw_mode),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = LocalSmartisanTypography.current.listItemPrimary,
                     )
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.mihomo_profile_raw_mode_summary),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                     )
                 }
-                Switch(checked = enabled, onCheckedChange = onEnabledChange)
+                SmartisanSwitch(checked = enabled, onCheckedChange = onEnabledChange)
             }
             if (enabled) {
-                Text(
+                SmartisanText(
                     text = stringResource(
                         when (readiness) {
                             RawConfigReadiness.Ready -> R.string.mihomo_profile_raw_mode_ready
@@ -1157,15 +1137,15 @@ private fun RawConfigModeControl(
                         },
                     ),
                     modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.labelLarge,
+                    style = LocalSmartisanTypography.current.sectionTitle,
                     color = when (readiness) {
-                        RawConfigReadiness.Blocked -> MaterialTheme.colorScheme.error
-                        else -> MaterialTheme.colorScheme.onTertiaryContainer
+                        RawConfigReadiness.Blocked -> LocalSmartisanColors.current.warning
+                        else -> LocalSmartisanColors.current.textPrimary
                     },
                 )
-                HorizontalDivider(
+                SmartisanDivider(
                     modifier = Modifier.padding(top = 10.dp, bottom = 4.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant,
+                    color = LocalSmartisanColors.current.rowDivider,
                 )
                 RawCapabilityRow(
                     title = stringResource(R.string.mihomo_profile_raw_api),
@@ -1209,16 +1189,16 @@ private fun RawCapabilityRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.labelMedium)
+            SmartisanText(title, style = LocalSmartisanTypography.current.listItemSecondary)
             if (source.isNotBlank()) {
-                Text(
+                SmartisanText(
                     source,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
         }
-        Text(value, style = MaterialTheme.typography.labelLarge)
+        SmartisanText(value, style = LocalSmartisanTypography.current.sectionTitle)
     }
 }
 
@@ -1240,25 +1220,13 @@ private fun RawModeConfirmationDialog(
     onConfirm: () -> Unit,
 ) {
     if (!show) return
-    AlertDialog(
+    SmartisanConfirmDialog(
         onDismissRequest = onDismissRequest,
-        icon = { Icon(Icons.Rounded.Lock, contentDescription = null) },
-        title = { Text(stringResource(R.string.mihomo_profile_raw_mode_confirm_title)) },
-        text = { Text(stringResource(R.string.mihomo_profile_raw_mode_confirm_message)) },
-        dismissButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.common_cancel),
-                icon = Icons.Rounded.Close,
-                onClick = onDismissRequest,
-            )
-        },
-        confirmButton = {
-            AsteriskActionButton(
-                text = stringResource(R.string.mihomo_profile_raw_mode_confirm),
-                icon = Icons.Rounded.Check,
-                onClick = onConfirm,
-            )
-        },
+        title = stringResource(R.string.mihomo_profile_raw_mode_confirm_title),
+        message = stringResource(R.string.mihomo_profile_raw_mode_confirm_message),
+        confirmText = stringResource(R.string.mihomo_profile_raw_mode_confirm),
+        dismissText = stringResource(R.string.common_cancel),
+        onConfirm = onConfirm,
     )
 }
 

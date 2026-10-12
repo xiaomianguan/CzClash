@@ -3,30 +3,28 @@
 
 package ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cc.wuersan008.smartisanx.core.utils.smartisanColor
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialog
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.R as SmartisanR
 
+/**
+ * Two-action confirmation in the Smartisan dialog style. The dialog content area uses the
+ * original always-light `smartisan_modal_content_background`, so the text color is fixed
+ * to the original primary text color rather than the (possibly dark) theme color.
+ */
 @Composable
 internal fun WarningConfirmDialog(
     show: Boolean,
@@ -40,62 +38,31 @@ internal fun WarningConfirmDialog(
     details: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     if (!show) return
-    AlertDialog(
+    val contentColor = smartisanColor(SmartisanR.color.smartisan_text_primary)
+    SmartisanDialog(
         onDismissRequest = onDismissRequest,
-        icon = {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Warning,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                )
-            }
-        },
-        title = { Text(title, style = MaterialTheme.typography.headlineSmall) },
-        text = {
-            Column {
-                Text(
-                    text = summary,
+        title = title,
+        confirmText = confirmText,
+        dismissText = dismissText,
+        onConfirm = onConfirm,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            SmartisanText(
+                text = summary,
+                modifier = Modifier.fillMaxWidth(),
+                color = contentColor,
+                textAlign = TextAlign.Center,
+            )
+            if (details != null) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(MaterialTheme.colorScheme.tertiaryContainer)
-                        .padding(14.dp),
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    style = MaterialTheme.typography.bodyMedium,
+                        .padding(top = 12.dp)
+                        .heightIn(max = detailsMaxHeight)
+                        .verticalScroll(rememberScrollState()),
+                    content = details,
                 )
-                if (details != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp)
-                            .heightIn(max = detailsMaxHeight)
-                            .verticalScroll(rememberScrollState()),
-                        content = details,
-                    )
-                }
             }
-        },
-        dismissButton = {
-            AsteriskActionButton(
-                text = dismissText,
-                icon = Icons.Rounded.Close,
-                onClick = onDismissRequest,
-            )
-        },
-        confirmButton = {
-            AsteriskActionButton(
-                text = confirmText,
-                icon = Icons.Rounded.Check,
-                onClick = onConfirm,
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            )
-        },
-    )
+        }
+    }
 }

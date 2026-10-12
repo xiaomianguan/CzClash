@@ -3,6 +3,8 @@
 
 package features.monitoring.traffic
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.text.format.DateUtils
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -65,9 +66,9 @@ internal fun TrafficMonitorPage(padding: PaddingValues) {
             item("today") {
                 MonitoringSectionCard(stringResource(R.string.monitor_traffic_today), TrafficContentModifier) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
+                        SmartisanText(
                             traffic.today.total.toReadableBytes(),
-                            style = MaterialTheme.typography.displaySmall,
+                            style = LocalSmartisanTypography.current.title,
                             fontWeight = FontWeight.SemiBold,
                         )
                         MonitoringValueRow(
@@ -126,11 +127,11 @@ internal fun TrafficMonitorPage(padding: PaddingValues) {
                             stringResource(R.string.monitor_connections_upload),
                             traffic.thirtyDays.upload.toReadableBytes(),
                         )
-                        Text(
+                        SmartisanText(
                             stringResource(R.string.monitor_traffic_local_notice),
                             modifier = Modifier.padding(top = 8.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                     }
                 }
@@ -143,18 +144,18 @@ internal fun TrafficMonitorPage(padding: PaddingValues) {
 private fun TrafficSpeedCard(
     samples: List<MonitoringTrafficSpeedSample>,
 ) {
-    val downloadColor = MaterialTheme.colorScheme.primary
-    val uploadColor = MaterialTheme.colorScheme.tertiary
+    val downloadColor = LocalSmartisanColors.current.accent
+    val uploadColor = LocalSmartisanColors.current.warning
     MonitoringSectionCard(
         title = stringResource(R.string.monitor_traffic_trend),
         modifier = TrafficContentModifier,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             TrafficSpeedChart(samples, downloadColor, uploadColor)
-            Text(
+            SmartisanText(
                 stringResource(R.string.monitor_traffic_last_5_minutes),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.textSecondary,
             )
         }
     }
@@ -196,11 +197,11 @@ private fun SevenDayTrafficCard(dailyTotals: Map<String, TrafficBytes>, total: T
     val today = localTrafficDay(System.currentTimeMillis())
     val days = localTrafficDaysEndingAt(today, 7)
     val values = days.map { day -> dailyTotals[day] ?: TrafficBytes() }
-    val downloadColor = MaterialTheme.colorScheme.primary
-    val uploadColor = MaterialTheme.colorScheme.tertiary
+    val downloadColor = LocalSmartisanColors.current.accent
+    val uploadColor = LocalSmartisanColors.current.warning
     MonitoringSectionCard(stringResource(R.string.monitor_traffic_7_days), TrafficContentModifier) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(total.total.toReadableBytes(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+            SmartisanText(total.total.toReadableBytes(), style = LocalSmartisanTypography.current.title, fontWeight = FontWeight.SemiBold)
             Canvas(Modifier.fillMaxWidth().height(170.dp)) {
                 val max = maxOf(1L, values.maxOfOrNull { it.total } ?: 0L).toFloat()
                 val groupWidth = size.width / values.size.coerceAtLeast(1)
@@ -227,7 +228,7 @@ private fun SevenDayTrafficCard(dailyTotals: Map<String, TrafficBytes>, total: T
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 days.forEach { day ->
-                    Text(day.takeLast(5), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    SmartisanText(day.takeLast(5), style = LocalSmartisanTypography.current.listItemCaptionSmall, color = LocalSmartisanColors.current.textSecondary)
                 }
             }
             Row(
@@ -247,7 +248,7 @@ private fun TrafficLegend(color: Color, label: String) {
         Canvas(Modifier.height(3.dp).widthIn(min = 20.dp, max = 20.dp)) {
             drawLine(color, Offset(0f, center.y), Offset(size.width, center.y), size.height, cap = StrokeCap.Round)
         }
-        Text(label, style = MaterialTheme.typography.labelMedium)
+        SmartisanText(label, style = LocalSmartisanTypography.current.listItemSecondary)
     }
 }
 

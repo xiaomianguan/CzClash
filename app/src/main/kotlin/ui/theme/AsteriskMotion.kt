@@ -25,8 +25,6 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MotionScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.IntOffset
@@ -156,35 +154,50 @@ internal object AsteriskMotion {
     fun <T> effects(reducedMotion: Boolean): FiniteAnimationSpec<T> = if (reducedMotion) {
         snap()
     } else {
-        MotionScheme.expressive().defaultEffectsSpec()
+        spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        )
     }
 
     @Composable
     fun <T> effects(): FiniteAnimationSpec<T> = if (LocalReduceMotion.current) {
         snap()
     } else {
-        MaterialTheme.motionScheme.defaultEffectsSpec()
+        spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        )
     }
 
     @Composable
     fun <T> fastEffects(): FiniteAnimationSpec<T> = if (LocalReduceMotion.current) {
         snap()
     } else {
-        MaterialTheme.motionScheme.fastEffectsSpec()
+        spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium,
+        )
     }
 
     @Composable
     fun <T> fastSpatial(): FiniteAnimationSpec<T> = if (LocalReduceMotion.current) {
         snap()
     } else {
-        MaterialTheme.motionScheme.fastSpatialSpec()
+        spring(
+            dampingRatio = 0.8f,
+            stiffness = 1200f,
+        )
     }
 
     @Composable
     fun <T> spatial(): FiniteAnimationSpec<T> = if (LocalReduceMotion.current) {
         snap()
     } else {
-        MaterialTheme.motionScheme.defaultSpatialSpec()
+        spring(
+            dampingRatio = 0.8f,
+            stiffness = 380f,
+        )
     }
 
     fun contentFade(reducedMotion: Boolean): FiniteAnimationSpec<Float> = if (reducedMotion) {

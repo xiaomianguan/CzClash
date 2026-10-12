@@ -3,19 +3,21 @@
 
 package ui.components
 
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.core.utils.smartisanProjectedShadow
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
 import ui.theme.ExpressiveInteractionState
 import ui.theme.ExpressiveShapeRole
 import ui.theme.expressiveShape
@@ -24,7 +26,7 @@ import ui.theme.expressiveShape
 internal fun rememberExpressiveShape(
     role: ExpressiveShapeRole,
     @Suppress("UNUSED_PARAMETER") state: ExpressiveInteractionState,
-): Shape = expressiveShape(role)
+): Shape = remember(role) { expressiveShape(role) }
 
 @Composable
 internal fun AsteriskExpressiveCard(
@@ -34,42 +36,30 @@ internal fun AsteriskExpressiveCard(
     expanded: Boolean = false,
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    selectedContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    border: BorderStroke? = null,
+    containerColor: Color = Color.Unspecified,
+    selectedContainerColor: Color = Color.Unspecified,
+    @Suppress("UNUSED_PARAMETER") border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    val colors = LocalSmartisanColors.current
     val interactionState = when {
         !enabled -> ExpressiveInteractionState.Disabled
         expanded -> ExpressiveInteractionState.Expanded
         selected -> ExpressiveInteractionState.Selected
         else -> ExpressiveInteractionState.Rest
     }
-    val shape = rememberExpressiveShape(role, interactionState)
-    val cardModifier = if (onClick == null) modifier else modifier.heightIn(min = 48.dp)
-    val colors = CardDefaults.cardColors(
-        containerColor = if (selected) selectedContainerColor else containerColor,
-    )
-
-    if (onClick == null) {
-        Card(
-            modifier = cardModifier,
-            shape = shape,
-            colors = colors,
-            border = border,
-            content = content,
-        )
+    // Same group-card texture + 12dp margin + outward shadow as the rest of the app.
+    val cardModifier = if (onClick == null) {
+        modifier
     } else {
-        Card(
-            onClick = onClick,
-            modifier = cardModifier,
-            enabled = enabled,
-            shape = shape,
-            colors = colors,
-            border = border,
-            interactionSource = interactionSource,
-            content = content,
-        )
+        modifier
+            .heightIn(min = 48.dp)
+            .smartisanClickable(enabled = enabled, onClick = onClick)
+    }
+    SmartisanGroup(
+        modifier = cardModifier,
+        position = SmartisanGroupRowPosition.Single,
+    ) {
+        content()
     }
 }

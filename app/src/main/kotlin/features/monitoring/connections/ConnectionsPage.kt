@@ -3,6 +3,12 @@
 
 package features.monitoring.connections
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.horizontalScroll
@@ -21,17 +27,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialog
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -168,7 +171,7 @@ internal fun ConnectionsMonitorPage(padding: PaddingValues) {
         title = stringResource(R.string.monitor_connections_title),
         outerPadding = padding,
         actions = {
-            IconButton(
+            SmartisanIconButton(
                 onClick = {
                     if (!paused) {
                         frozenConnections = connections
@@ -177,24 +180,24 @@ internal fun ConnectionsMonitorPage(padding: PaddingValues) {
                     paused = !paused
                 },
             ) {
-                Icon(
-                    imageVector = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
+                AsteriskIcon(
+                    res = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
                     contentDescription = stringResource(
                         if (paused) R.string.monitor_connections_resume else R.string.monitor_connections_pause,
                     ),
                 )
             }
             Box {
-                IconButton(
+                SmartisanIconButton(
                     onClick = { showMenu = true },
                     enabled = appState.proxyRunning && liveIds.isNotEmpty() && !operationInProgress,
                 ) {
-                    Icon(Icons.Rounded.MoreVert, stringResource(R.string.home_more_actions))
+                    AsteriskIcon(Icons.Rounded.MoreVert, stringResource(R.string.home_more_actions))
                 }
-                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.monitor_connections_close_all)) },
-                        leadingIcon = { Icon(Icons.Rounded.LinkOff, contentDescription = null) },
+                AsteriskPopupMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.monitor_connections_close_all)) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.LinkOff, contentDescription = null) },
                         onClick = {
                             showMenu = false
                             showCloseAllConfirmation = true
@@ -288,47 +291,35 @@ internal fun ConnectionsMonitorPage(padding: PaddingValues) {
     }
 
     if (showCloseAllConfirmation) {
-        AlertDialog(
+        val activeCount = displayedConnections.activeCount ?: 0
+        SmartisanDialog(
             onDismissRequest = { showCloseAllConfirmation = false },
-            title = { Text(stringResource(R.string.monitor_connections_close_all)) },
-            text = {
-                val activeCount = displayedConnections.activeCount ?: 0
-                Text(
-                    pluralStringResource(
-                        R.plurals.monitor_connections_close_all_message,
-                        activeCount,
-                        activeCount,
-                    ),
-                )
-            },
-            confirmButton = {
-                AsteriskActionButton(
-                    text = stringResource(R.string.monitor_connections_close_all_confirm),
-                    icon = Icons.Rounded.LinkOff,
-                    enabled = appState.proxyRunning && liveIds.isNotEmpty() && !operationInProgress,
-                    onClick = {
-                        showCloseAllConfirmation = false
-                        operationInProgress = true
-                        scope.launch {
-                            services.monitoring.closeAllConnections()
-                                .onSuccess {
-                                    frozenConnections = clearDisplayedConnections(frozenConnections)
-                                    frozenPageSnapshot = frozenPageSnapshot.copy(active = emptyList())
-                                }
-                                .onFailure { error -> services.tipNotifier.showError(error, closeAllFailed) }
-                            operationInProgress = false
+            title = stringResource(R.string.monitor_connections_close_all),
+            confirmText = stringResource(R.string.monitor_connections_close_all_confirm),
+            dismissText = stringResource(R.string.common_cancel),
+            confirmEnabled = appState.proxyRunning && liveIds.isNotEmpty() && !operationInProgress,
+            onConfirm = {
+                operationInProgress = true
+                scope.launch {
+                    services.monitoring.closeAllConnections()
+                        .onSuccess {
+                            frozenConnections = clearDisplayedConnections(frozenConnections)
+                            frozenPageSnapshot = frozenPageSnapshot.copy(active = emptyList())
                         }
-                    },
-                )
+                        .onFailure { error -> services.tipNotifier.showError(error, closeAllFailed) }
+                    operationInProgress = false
+                }
             },
-            dismissButton = {
-                AsteriskActionButton(
-                    text = stringResource(R.string.common_cancel),
-                    icon = Icons.Rounded.Close,
-                    onClick = { showCloseAllConfirmation = false },
-                )
-            },
-        )
+        ) {
+            SmartisanText(
+                text = pluralStringResource(
+                    R.plurals.monitor_connections_close_all_message,
+                    activeCount,
+                    activeCount,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -367,11 +358,11 @@ private fun ConnectionsMonitorStatus(
         summary = summary,
         modifier = ContentWidthModifier,
         controls = {
-            TextButton(
+            AsteriskLinkButton(
                 onClick = { showStateMenu = true },
                 modifier = Modifier.heightIn(min = 48.dp),
             ) {
-                Text(text = if (showClosed) closedLabel else activeLabel, maxLines = 1)
+                SmartisanText(text = if (showClosed) closedLabel else activeLabel, maxLines = 1)
                 Spacer(Modifier.width(4.dp))
                 AsteriskDropdownAnchor(
                     expanded = showStateMenu,
@@ -418,7 +409,7 @@ private fun ConnectionControls(
                 selected = false,
                 onClick = { showSortMenu = true },
                 label = connectionSortLabel(sort),
-                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Sort, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.AutoMirrored.Rounded.Sort, contentDescription = null) },
                 trailingIcon = {
                     AsteriskDropdownAnchor(
                         expanded = showSortMenu,
@@ -453,59 +444,58 @@ private fun ConnectionCard(
     // The core reports the final outbound first, followed by its enclosing groups.
     val policyChain = connection.chains.asReversed().joinToString(" → ")
     val providerSources = connection.providerChains.filter(String::isNotBlank).distinct().joinToString(" · ")
-    Card(
-        onClick = onOpen,
-        modifier = ContentWidthModifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        shape = MaterialTheme.shapes.large,
+    SmartisanCard(
+        modifier = ContentWidthModifier.smartisanClickable(onClick = onOpen),
+        color = LocalSmartisanColors.current.surface,
+        shape = LocalSmartisanShapes.current.large,
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, top = 14.dp, bottom = 14.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
+                SmartisanText(
                     text = connection.destinationAddress.ifBlank { stringResource(R.string.monitor_value_unknown) },
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
+                SmartisanText(
                     text = listOf(
                         connection.process.ifBlank { stringResource(R.string.monitor_connections_unknown_source) },
                         connection.network.uppercase().ifBlank { stringResource(R.string.monitor_value_unknown) },
                         formatDuration(connection.startedAtMillis, detectedClosedAt),
                     ).joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 val routing = policyChain
                     .ifBlank { listOf(connection.rule, connection.rulePayload).filter(String::isNotBlank).joinToString(" · ") }
                 if (routing.isNotBlank()) {
-                    Text(
+                    SmartisanText(
                         text = routing,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                Text(
+                SmartisanText(
                     text = formatConnectionRate(connection),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = LocalSmartisanTypography.current.sectionTitle,
+                    color = LocalSmartisanColors.current.accent,
                 )
             }
             AsteriskExpansionIndicator(
                 expanded = expanded,
                 contentDescription = stringResource(R.string.monitor_connections_details),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = LocalSmartisanColors.current.textSecondary,
             )
-            IconButton(onClick = onClose, enabled = closeEnabled) {
-                Icon(Icons.Rounded.LinkOff, stringResource(R.string.monitor_connections_close_one))
+            SmartisanIconButton(onClick = onClose, enabled = closeEnabled) {
+                AsteriskIcon(Icons.Rounded.LinkOff, stringResource(R.string.monitor_connections_close_one))
             }
         }
         AnimatedVisibility(
@@ -557,17 +547,17 @@ private fun DetailRow(label: String, value: String) {
 
 @Composable
 private fun StatusCard(message: String, loading: Boolean = false) {
-    Card(
+    SmartisanCard(
         modifier = ContentWidthModifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        color = LocalSmartisanColors.current.surface,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(24.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (loading) CircularProgressIndicator(modifier = Modifier.padding(end = 12.dp))
-            Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (loading) AsteriskSpinner(modifier = Modifier.padding(end = 12.dp))
+            SmartisanText(message, color = LocalSmartisanColors.current.textSecondary)
         }
     }
 }

@@ -3,6 +3,11 @@
 
 package features.monitoring
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,12 +15,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
 import ui.components.AsteriskSearchTopAppBar
 import ui.components.AsteriskScaffold
 import ui.components.AsteriskTopAppBar
@@ -52,11 +54,11 @@ internal fun MonitoringScaffold(
                         query = searchQuery,
                         onQueryChange = onSearchQueryChange,
                         placeholder = searchPlaceholder,
-                        title = { Text(title) },
+                        title = { SmartisanText(title) },
                         navigationIcon = {
-                            IconButton(onClick = navigator::pop) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            SmartisanIconButton(onClick = navigator::pop) {
+                                AsteriskIcon(
+                                    res = Icons.AutoMirrored.Rounded.ArrowBack,
                                     contentDescription = stringResource(R.string.common_back),
                                 )
                             }
@@ -65,11 +67,11 @@ internal fun MonitoringScaffold(
                     )
                 } else {
                     AsteriskTopAppBar(
-                        title = { Text(title) },
+                        title = { SmartisanText(title) },
                         navigationIcon = {
-                            IconButton(onClick = navigator::pop) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            SmartisanIconButton(onClick = navigator::pop) {
+                                AsteriskIcon(
+                                    res = Icons.AutoMirrored.Rounded.ArrowBack,
                                     contentDescription = stringResource(R.string.common_back),
                                 )
                             }
@@ -97,20 +99,20 @@ internal fun MonitoringSectionCard(
     headerContent: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    Card(
+    SmartisanCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        shape = MaterialTheme.shapes.extraLarge,
+        color = LocalSmartisanColors.current.surface,
+        shape = LocalSmartisanShapes.current.medium,
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                SmartisanText(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = LocalSmartisanTypography.current.listItemPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -138,19 +140,19 @@ internal fun MonitoringStatusHeader(
         compactStatus = compactStatus,
         controls = controls,
     ) {
-        Text(
+        SmartisanText(
             text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.sectionTitle,
+            color = LocalSmartisanColors.current.textSecondary,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
+            SmartisanText(
                 text = value,
                 modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.headlineMedium.copy(
+                style = LocalSmartisanTypography.current.title.copy(
                     fontWeight = FontWeight.SemiBold,
                     fontFeatureSettings = "tnum",
                 ),

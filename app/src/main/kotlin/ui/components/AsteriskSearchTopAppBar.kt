@@ -11,9 +11,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBarScrollBehavior
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,7 +44,6 @@ internal fun AsteriskSearchTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
     searchAvailable: Boolean = true,
     searchField: @Composable (Modifier) -> Unit = { fieldModifier ->
         AsteriskSearchField(
@@ -90,10 +88,9 @@ internal fun AsteriskSearchTopAppBar(
             }
             AsteriskTopAppBar(
                 modifier = modifier,
-                scrollBehavior = scrollBehavior,
                 navigationIcon = {
-                    IconButton(onClick = { closeSearch() }) {
-                        Icon(
+                    SmartisanIconButton(onClick = { closeSearch() }) {
+                        AsteriskIcon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
                             stringResource(R.string.common_back),
                         )
@@ -108,11 +105,10 @@ internal fun AsteriskSearchTopAppBar(
                 title = title,
                 modifier = modifier,
                 navigationIcon = navigationIcon,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     if (searchAvailable) {
-                        IconButton(onClick = { searchActive = true }) {
-                            Icon(Icons.Rounded.Search, stringResource(R.string.common_search))
+                        SmartisanIconButton(onClick = { searchActive = true }) {
+                            AsteriskIcon(Icons.Rounded.Search, stringResource(R.string.common_search))
                         }
                     }
                     actions()

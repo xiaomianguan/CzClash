@@ -3,11 +3,8 @@
 
 package ui.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import cc.wuersan008.smartisanx.core.theme.SmartisanTypography
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -18,161 +15,107 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.ripple
+import androidx.compose.foundation.layout.width
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.haze.HazeInput
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.blur.HazeBlurStyle
-import dev.chrisbanes.haze.blur.HazeColorEffect
-import dev.chrisbanes.haze.blur.hazeBlur
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
-import ui.theme.AsteriskMotion
+import cc.wuersan008.smartisanx.core.interaction.collectSmartisanPressedAsState
+import cc.wuersan008.smartisanx.core.interaction.rememberSmartisanInteractionSource
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.utils.smartisanDrawableBackground
+import cc.wuersan008.smartisanx.ui.asset.SmartisanDrawables
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.layout.SmartisanScaffold
+import cc.wuersan008.smartisanx.ui.layout.SmartisanTitleBarSurface
 
-internal val LocalChromeBackdrop = compositionLocalOf<HazeState?> { null }
+private val EmptyChromeContent: @Composable () -> Unit = {}
 
-// Shared by top bars, floating navigation controls, and the no-blur fallback.
-private const val ChromeTransparency = 0.60f
-
-@Composable
-internal fun chromeStyle(): HazeBlurStyle {
-    val surface = MaterialTheme.colorScheme.surface
-    val tint = HazeColorEffect.tint(surface.copy(alpha = 1f - ChromeTransparency))
-    return HazeBlurStyle {
-        backgroundColor(surface)
-        colorEffects(listOf(tint))
-        blurRadius(18.dp)
-        noiseFactor(0f)
-        fallbackColorEffect(tint)
-    }
-}
-
-/** Keep each page's backdrop separate so transitions never sample another page. */
+/**
+ * Page skeleton on the Smartisan scaffold: the original striped page background, the
+ * title bar with its outward shadow, and the bottom bar, all from `smartisanx`.
+ */
 @Composable
 internal fun AsteriskScaffold(
     modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit = {},
-    bottomBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
-    containerColor: Color = MaterialTheme.colorScheme.background,
-    contentColor: Color = contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    topBar: @Composable () -> Unit = EmptyChromeContent,
+    bottomBar: @Composable () -> Unit = EmptyChromeContent,
+    snackbarHost: @Composable () -> Unit = EmptyChromeContent,
+    floatingActionButton: @Composable () -> Unit = EmptyChromeContent,
+    @Suppress("UNUSED_PARAMETER") contentWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val backdrop = rememberHazeState()
-    val style = chromeStyle()
-    Scaffold(
+    SmartisanScaffold(
         modifier = modifier,
-        topBar = {
-            Box(Modifier.fillMaxWidth().clipToBounds().hazeBlur(HazeInput.Sources(backdrop), style)) {
-                topBar()
-            }
-        },
-        bottomBar = {
-            CompositionLocalProvider(LocalChromeBackdrop provides backdrop) {
-                bottomBar()
-            }
-        },
-        snackbarHost = snackbarHost,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
-    ) { padding ->
-        // Capture content only; including the bars would feed an effect back into itself.
-        Box(
-            modifier = Modifier.fillMaxSize().hazeSource(backdrop),
-        ) {
-            CompositionLocalProvider(LocalChromeBackdrop provides backdrop) {
-                content(padding)
-            }
+        titleBar = if (topBar !== EmptyChromeContent) topBar else null,
+        bottomBar = if (bottomBar !== EmptyChromeContent) bottomBar else null,
+        applyNavigationBarInset = false,
+        contentScrollable = true,
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            content(PaddingValues(0.dp))
+            snackbarHost()
+            floatingActionButton()
         }
     }
 }
 
+/**
+ * Title bar in the Smartisan style: original `titlebar_bg` background, a shadow drawn
+ * outside its bounds over the content, and a centered title flanked by navigation and
+ * action slots (kept as composable lambdas so existing call sites keep working).
+ */
 @Composable
 internal fun AsteriskTopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    TopAppBar(
-        title = title,
-        modifier = modifier,
-        navigationIcon = navigationIcon,
-        actions = actions,
-        scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Transparent,
-        ),
-    )
+    // Match the library title bar, but one weight lighter (Medium, not Bold): the
+    // Smartisan Compact CNS font ships a real Medium face, and Bold reads too heavy here.
+    val typography = LocalSmartisanTypography.current
+    val titleTypography = remember(typography) { SmartisanTypography(body = typography.title) }
+    SmartisanTitleBarSurface(modifier = modifier) {
+        Box(Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                navigationIcon()
+            }
+            Row(
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = actions,
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 72.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CompositionLocalProvider(LocalSmartisanTypography provides titleTypography) {
+                    title()
+                }
+            }
+        }
+    }
 }
 
-@Composable
-private fun Modifier.floatingChrome(): Modifier =
-    shadow(6.dp, CircleShape)
-        .clip(CircleShape)
-        .hazeBlur(
-            input = LocalChromeBackdrop.current?.let { HazeInput.Sources(it) }
-                ?: HazeInput.Content,
-            style = chromeStyle(),
-        )
-        .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f), CircleShape)
-
-@Composable
-private fun floatingNavigationContentColor(selected: Boolean): Color {
-    val color by animateColorAsState(
-        targetValue = if (selected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
-        animationSpec = AsteriskMotion.fastEffects(),
-        label = "navigation-item-color",
-    )
-    return color
-}
-
+/** Round action button used beside the bottom navigation bar (e.g. the service power toggle). */
 @Composable
 internal fun AsteriskFloatingNavigationAction(
     selected: Boolean,
@@ -181,64 +124,63 @@ internal fun AsteriskFloatingNavigationAction(
     enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val contentColor = floatingNavigationContentColor(selected)
-    val interactionSource = remember { MutableInteractionSource() }
+    val colors = LocalSmartisanColors.current
+    val interaction = rememberSmartisanInteractionSource()
+    val pressed by interaction.collectSmartisanPressedAsState()
     Box(
         modifier = modifier
-            .size(64.dp)
-            .clickable(
+            .size(56.dp)
+            .smartisanDrawableBackground(
+                drawableRes = SmartisanDrawables.BottomBarBackground,
                 enabled = enabled,
-                role = Role.Button,
-                interactionSource = interactionSource,
-                indication = null,
+                pressed = pressed && enabled,
+                activated = selected,
+            )
+            .smartisanClickable(
+                interactionSource = interaction,
+                enabled = enabled,
                 onClick = onClick,
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.matchParentSize().floatingChrome())
-        Box(
-            Modifier
-                .matchParentSize()
-                .clip(CircleShape)
-                .asteriskNavigationSelection(selected)
-                .indication(interactionSource, ripple()),
-        )
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center, content = content)
+        CompositionLocalProvider(
+            LocalSmartisanContentColor provides
+                if (selected) colors.accent else colors.textSecondary,
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+                content = content,
+            )
         }
     }
 }
 
+/**
+ * Compact bottom navigation bar in the original Smartisan tab-bar style: the
+ * `bottom_bar` nine-patch background, square corners, accent-colored selected tab.
+ */
 @Composable
 internal fun AsteriskFloatingNavigationBar(
     modifier: Modifier = Modifier,
     trailingAction: (@Composable () -> Unit)? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center,
+            .smartisanDrawableBackground(SmartisanDrawables.BottomBarBackground)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(Modifier.weight(1f)) {
-                Box(Modifier.matchParentSize().floatingChrome())
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(6.dp)
-                        .selectableGroup(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = content,
-                )
-            }
-            trailingAction?.invoke()
+            content = content,
+        )
+        trailingAction?.let { action ->
+            Box(Modifier.padding(start = 6.dp)) { action() }
         }
     }
 }
@@ -247,52 +189,33 @@ internal fun AsteriskFloatingNavigationBar(
 internal fun RowScope.AsteriskFloatingNavigationItem(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: ImageVector,
+    icon: Int,
     label: String,
 ) {
-    val contentColor = floatingNavigationContentColor(selected)
-    val interactionSource = remember { MutableInteractionSource() }
-    Box(
+    val colors = LocalSmartisanColors.current
+    val typography = LocalSmartisanTypography.current
+    val tint = if (selected) colors.accent else colors.textSecondary
+    Column(
         modifier = Modifier
             .weight(1f)
-            .asteriskNavigationSelection(selected)
-            .selectable(
-                selected = selected,
-                role = Role.Tab,
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-            ),
+            .smartisanClickable(onClick = onClick)
+            .padding(horizontal = 2.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
     ) {
-        // Clip only the pressed feedback; large labels must not be cut by the pill curve.
-        Box(
-            Modifier
-                .matchParentSize()
-                .clip(CircleShape)
-                .indication(interactionSource, ripple()),
+        AsteriskIcon(
+            res = icon,
+            contentDescription = null,
+            tint = tint,
+            size = 22.dp,
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 52.dp)
-                .padding(horizontal = 4.dp, vertical = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(22.dp),
-                tint = contentColor,
-            )
-            Text(
-                text = label,
-                color = contentColor,
-                style = MaterialTheme.typography.labelMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-            )
-        }
+        SmartisanText(
+            text = label,
+            style = typography.listItemCaptionSmall,
+            color = tint,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
     }
 }

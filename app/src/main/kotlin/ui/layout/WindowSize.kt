@@ -10,9 +10,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 internal fun pageGutterForWidth(widthDp: Float): Dp = when {
+    // Like the sample app: list content is only inset by the group card margin (12dp),
+    // so pages add no extra horizontal gutter on phones.
     widthDp >= 840f -> 32.dp
     widthDp >= 600f -> 24.dp
-    else -> 16.dp
+    else -> 0.dp
 }
 
 internal fun useNavigationRailForWidth(widthDp: Float): Boolean = widthDp >= 600f

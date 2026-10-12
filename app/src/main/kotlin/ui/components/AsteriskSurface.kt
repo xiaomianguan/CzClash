@@ -3,76 +3,54 @@
 
 package ui.components
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.Velocity
-import ui.theme.AsteriskShapeTokens
-import kotlin.math.abs
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.utils.smartisanDrawableBackground
+import cc.wuersan008.smartisanx.ui.asset.SmartisanDrawables
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanModal
 
 @Composable
 internal fun AsteriskPageCard(
     modifier: Modifier = Modifier,
-    selected: Boolean = false,
+    @Suppress("UNUSED_PARAMETER") selected: Boolean = false,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val border = BorderStroke(
-        width = if (selected) 2.dp else 1.dp,
-        color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-    )
-    AsteriskExpressiveCard(
-        modifier = modifier,
-        selected = selected,
-        onClick = onClick,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        border = border,
-        content = content,
-    )
+    // Use the original Smartisan group-card texture (content 9-patch + outward shadow).
+    SmartisanGroup(
+        modifier = modifier.then(
+            if (onClick != null) Modifier.smartisanClickable(onClick = onClick) else Modifier,
+        ),
+        position = SmartisanGroupRowPosition.Single,
+    ) {
+        content()
+    }
 }
 
+/**
+ * Bottom sheet rebuilt on the Smartisan modal window: the original `menu_dialog` background,
+ * a square-cornered panel anchored to the bottom, and the existing header/action slots.
+ */
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 internal fun AsteriskModalBottomSheet(
     show: Boolean,
     onDismissRequest: () -> Unit,
@@ -83,69 +61,27 @@ internal fun AsteriskModalBottomSheet(
     endAction: @Composable () -> Unit = EmptySheetAction,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val currentShow by rememberUpdatedState(show)
-    val currentDismissEnabled by rememberUpdatedState(dismissEnabled)
-    val sheetState = rememberBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        enabledValues = setOf(
-            SheetValue.Hidden,
-            SheetValue.Expanded,
-        ),
-        confirmValueChange = { targetValue ->
-            shouldAllowSheetStateChange(
-                targetValue = targetValue,
-                show = currentShow,
-                dismissEnabled = currentDismissEnabled,
-            )
-        },
-    )
-    var renderSheet by remember { mutableStateOf(show) }
-    val contentScrollConnection = remember {
-        SheetContentNestedScrollConnection()
-    }
-
-    LaunchedEffect(show) {
-        if (show) {
-            renderSheet = true
-            if (sheetState.isVisible) sheetState.show()
-        } else if (renderSheet) {
-            sheetState.hide()
-            if (!sheetState.isVisible) renderSheet = false
-        }
-    }
-
-    if (!renderSheet) return
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        // Keep the top inset independent of the sheet offset to avoid changing drag anchors.
-        modifier = modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top)),
-        sheetState = sheetState,
-        sheetGesturesEnabled = dismissEnabled,
-        shape = AsteriskShapeTokens.Sheet,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        dragHandle = { BottomSheetDefaults.DragHandle() },
-        contentWindowInsets = {
-            WindowInsets.safeDrawing
-                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                .union(WindowInsets.ime)
-        },
+    if (!show) return
+    val typography = LocalSmartisanTypography.current
+    val colors = LocalSmartisanColors.current
+    val shapes = LocalSmartisanShapes.current
+    SmartisanModal(
+        onDismissRequest = { if (dismissEnabled) onDismissRequest() },
+        modifier = modifier,
+        bottom = true,
     ) {
         Column(
             modifier = Modifier
-                .nestedScroll(contentScrollConnection)
-                .pointerInput(contentScrollConnection) {
-                    awaitEachGesture {
-                        awaitFirstDown(requireUnconsumed = false)
-                        contentScrollConnection.startGesture()
-                        do {
-                            val event = awaitPointerEvent()
-                        } while (event.changes.any { change -> change.pressed })
-                    }
-                },
+                .fillMaxWidth()
+                .clip(shapes.sheet)
+                .smartisanDrawableBackground(SmartisanDrawables.MenuDialogBackground),
         ) {
             if (title != null || startAction !== EmptySheetAction || endAction !== EmptySheetAction) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 56.dp)
+                        .padding(start = 6.dp, end = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
@@ -153,9 +89,10 @@ internal fun AsteriskModalBottomSheet(
                     }
                     Box(modifier = Modifier.weight(1.4f), contentAlignment = Alignment.Center) {
                         title?.let { sheetTitle ->
-                            Text(
+                            SmartisanText(
                                 text = sheetTitle,
-                                style = MaterialTheme.typography.titleLarge,
+                                style = typography.dialogTitle,
+                                color = colors.textSecondary,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -168,74 +105,6 @@ internal fun AsteriskModalBottomSheet(
                 }
             }
             content()
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-internal fun shouldAllowSheetStateChange(
-    targetValue: SheetValue,
-    show: Boolean,
-    dismissEnabled: Boolean,
-): Boolean =
-    targetValue != SheetValue.Hidden || !show || dismissEnabled
-
-internal class SheetGestureHandoffGuard {
-    private var hasScrollDecision = false
-    private var canDragSheet = false
-
-    fun startGesture() {
-        hasScrollDecision = false
-        canDragSheet = false
-    }
-
-    fun recordScroll(consumedY: Float, availableY: Float) {
-        if (hasScrollDecision) return
-        // Scroll startup or an ancestor consuming the delta can leave no vertical movement.
-        // Wait for movement before deciding who owns this gesture.
-        if (consumedY == 0f && availableY == 0f) return
-        hasScrollDecision = true
-        // decide once, allowing subpixel consumption at the content boundary.
-        canDragSheet = availableY > 0f && abs(consumedY) < 0.5f
-    }
-
-    fun shouldConsumeDownwardRemainder(remainderY: Float): Boolean =
-        hasScrollDecision && !canDragSheet && remainderY > 0f
-
-    fun endGesture() {
-        startGesture()
-    }
-}
-
-private class SheetContentNestedScrollConnection : NestedScrollConnection {
-    private val handoffGuard = SheetGestureHandoffGuard()
-
-    fun startGesture() {
-        handoffGuard.startGesture()
-    }
-
-    override fun onPostScroll(
-        consumed: Offset,
-        available: Offset,
-        source: NestedScrollSource,
-    ): Offset {
-        if (source == NestedScrollSource.UserInput) {
-            handoffGuard.recordScroll(consumed.y, available.y)
-        }
-        return if (handoffGuard.shouldConsumeDownwardRemainder(available.y)) {
-            Offset(x = 0f, y = available.y)
-        } else {
-            Offset.Zero
-        }
-    }
-
-    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-        val consumeRemainder = handoffGuard.shouldConsumeDownwardRemainder(available.y)
-        handoffGuard.endGesture()
-        return if (consumeRemainder) {
-            Velocity(x = 0f, y = available.y)
-        } else {
-            Velocity.Zero
         }
     }
 }

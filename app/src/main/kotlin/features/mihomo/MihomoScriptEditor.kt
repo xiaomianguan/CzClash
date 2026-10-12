@@ -3,10 +3,13 @@
 
 package features.mihomo
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
@@ -25,8 +28,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -193,11 +194,10 @@ private fun SoraCodeEditor(
         label = "script-editor-border-color",
     )
 
-    Surface(
+    SmartisanSurface(
         modifier = modifier,
         shape = AsteriskShapeTokens.SmallContainer,
         color = colors.background,
-        border = BorderStroke(borderWidth, borderColor),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(
@@ -226,13 +226,12 @@ private fun SoraCodeEditor(
                 modifier = Modifier.fillMaxSize(),
             )
             if (!readOnly) {
-                Surface(
+                SmartisanSurface(
                     modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                     shape = AsteriskShapeTokens.InnerContainer,
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    tonalElevation = 3.dp,
+                    color = LocalSmartisanColors.current.selectionBackground,
                 ) {
-                    IconButton(
+                    SmartisanIconButton(
                         enabled = !formatting,
                         onClick = {
                             val source = state.snapshotText()
@@ -258,16 +257,15 @@ private fun SoraCodeEditor(
                         },
                     ) {
                         if (formatting) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                strokeWidth = 2.dp,
-                            )
+                            AsteriskSpinner(
+                                size = 18.dp,
+                                color = LocalSmartisanColors.current.textPrimary,
+                                )
                         } else {
-                            Icon(
+                            AsteriskIcon(
                                 Icons.Rounded.AutoFixHigh,
                                 contentDescription = formatLabel,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                tint = LocalSmartisanColors.current.textPrimary,
                             )
                         }
                     }
@@ -395,30 +393,30 @@ private fun CodeTokenKind.soraColorId(): Int = when (this) {
 
 @Composable
 private fun rememberCodeEditorColors(): CodeEditorColors {
-    val colorScheme = MaterialTheme.colorScheme
+    val colors = LocalSmartisanColors.current
     val darkTheme = isInDarkTheme()
-    return remember(colorScheme, darkTheme) {
+    return remember(colors, darkTheme) {
         CodeEditorColors(
             darkTheme = darkTheme,
-            accent = colorScheme.primary,
-            foreground = colorScheme.onSurface,
-            background = colorScheme.surfaceContainerHigh,
-            gutter = colorScheme.surfaceContainerHighest,
-            separator = colorScheme.outlineVariant.copy(alpha = 0.72f),
-            border = colorScheme.outlineVariant.copy(alpha = 0.48f),
-            lineNumber = colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
-            selection = colorScheme.primary.copy(alpha = if (darkTheme) 0.34f else 0.24f),
-            currentLine = colorScheme.primary.copy(alpha = if (darkTheme) 0.10f else 0.06f),
-            keyword = colorScheme.primary,
-            key = colorScheme.primary,
-            string = colorScheme.tertiary,
-            number = colorScheme.secondary,
-            literal = colorScheme.tertiary,
-            function = colorScheme.secondary,
-            comment = colorScheme.onSurfaceVariant.copy(alpha = 0.68f),
-            operator = colorScheme.onSurfaceVariant,
-            actionBackground = colorScheme.surfaceContainerHigh,
-            actionForeground = colorScheme.onSurface,
+            accent = colors.accent,
+            foreground = colors.textPrimary,
+            background = colors.surfaceRaised,
+            gutter = colors.surfaceRaised,
+            separator = colors.rowDivider.copy(alpha = 0.72f),
+            border = colors.rowDivider.copy(alpha = 0.48f),
+            lineNumber = colors.textSecondary.copy(alpha = 0.72f),
+            selection = colors.accent.copy(alpha = if (darkTheme) 0.34f else 0.24f),
+            currentLine = colors.accent.copy(alpha = if (darkTheme) 0.10f else 0.06f),
+            keyword = colors.accent,
+            key = colors.accent,
+            string = colors.warning,
+            number = colors.success,
+            literal = colors.warning,
+            function = colors.success,
+            comment = colors.textSecondary.copy(alpha = 0.68f),
+            operator = colors.textSecondary,
+            actionBackground = colors.surfaceRaised,
+            actionForeground = colors.textPrimary,
         )
     }
 }

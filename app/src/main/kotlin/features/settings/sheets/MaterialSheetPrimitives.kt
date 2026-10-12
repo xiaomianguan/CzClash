@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import features.settings.SettingsDropdownRow
 import features.settings.SettingsSwitchRow
@@ -53,7 +52,7 @@ internal fun SettingsModalBottomSheet(
 @Composable
 internal fun TextButton(
     text: String,
-    icon: ImageVector,
+    icon: Int,
     onClick: () -> Unit,
     enabled: Boolean = true,
 ) {
@@ -68,7 +67,7 @@ internal fun TextButton(
 @Composable
 internal fun WindowDropdownPreference(
     title: String,
-    icon: ImageVector,
+    icon: Int,
     items: List<String>,
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
@@ -87,7 +86,7 @@ internal fun WindowDropdownPreference(
 @Composable
 internal fun SwitchPreference(
     title: String,
-    icon: ImageVector,
+    icon: Int,
     summary: String = "",
     checked: Boolean,
     enabled: Boolean = true,

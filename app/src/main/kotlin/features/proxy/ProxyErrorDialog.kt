@@ -3,6 +3,7 @@
 
 package features.proxy
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -11,11 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialogButton
+import ui.components.AsteriskModalDialog
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -116,19 +119,42 @@ private fun ProxyErrorDialog(
         }.trimEnd()
     }
 
-    AlertDialog(
+    AsteriskModalDialog(
+        title = stringResource(R.string.proxy_error_dialog_title),
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.proxy_error_dialog_title)) },
-        text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Text(
+        buttons = {
+            SmartisanDialogButton(
+                text = stringResource(R.string.proxy_error_dialog_copy),
+                onClick = {
+                    copyToClipboard(context, copyPayload)
+                    runCatching {
+                        android.widget.Toast.makeText(context, copiedLabel, android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                accent = false,
+            )
+            SmartisanDialogButton(
+                text = stringResource(R.string.proxy_error_dialog_close),
+                onClick = onDismiss,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 380.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
+                SmartisanText(
                     text = modeLine,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = LocalSmartisanTypography.current.listRowPrimary,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
+                SmartisanText(
                     text = timeLine,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
                 )
 
                 SectionLabel(detailsLabel)
@@ -147,34 +173,22 @@ private fun ProxyErrorDialog(
                 if (suggestions.isNotEmpty()) {
                     SectionLabel(diagnosticsLabel)
                     suggestions.forEach { suggestion ->
-                        Text(
+                        SmartisanText(
                             text = "• $suggestion",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = LocalSmartisanTypography.current.body,
                         )
                     }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                copyToClipboard(context, copyPayload)
-                runCatching {
-                    android.widget.Toast.makeText(context, copiedLabel, android.widget.Toast.LENGTH_SHORT).show()
-                }
-            }) { Text(stringResource(R.string.proxy_error_dialog_copy)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.proxy_error_dialog_close)) }
-        },
-    )
+        }
 }
 
 @Composable
 private fun SectionLabel(text: String) {
     Spacer(modifier = Modifier.height(16.dp))
-    Text(
+    SmartisanText(
         text = text,
-        style = MaterialTheme.typography.labelLarge,
+        style = LocalSmartisanTypography.current.sectionTitle,
     )
     Spacer(modifier = Modifier.height(4.dp))
 }
@@ -183,9 +197,9 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun MonospaceBlock(text: String) {
     SelectionContainer {
-        Text(
+        SmartisanText(
             text = text,
-            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+            style = LocalSmartisanTypography.current.listItemSecondary.copy(fontFamily = FontFamily.Monospace),
         )
     }
 }

@@ -5,7 +5,6 @@ package features.settings
 
 import android.os.Build
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import app.R
 import ui.icons.AsteriskIcons as Icons
@@ -13,7 +12,7 @@ import ui.icons.AsteriskIcons as Icons
 internal data class SettingsSearchEntry(
     val title: String,
     val parent: String,
-    val icon: ImageVector,
+    val icon: Int,
     val onClick: () -> Unit,
 )
 

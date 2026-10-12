@@ -3,6 +3,10 @@
 
 package features.mihomo.provider
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,11 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,20 +69,18 @@ internal fun MihomoProviderPreviewDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        Card(
+        SmartisanCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 880.dp)
                 .padding(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            ),
+            color = LocalSmartisanColors.current.surfaceRaised,
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.mihomo_profile_preview_title)
                         .formatTemplate("name" to providerName.ifBlank { "-" }),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = LocalSmartisanTypography.current.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
@@ -138,10 +137,10 @@ private fun ProviderTextPreviewContent(
         }
     }
 
-    Text(
+    SmartisanText(
         text = metadata,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalSmartisanTypography.current.listItemSecondary,
+        color = LocalSmartisanColors.current.textSecondary,
         modifier = Modifier.padding(bottom = 10.dp),
     )
     if (rawContent.lastError.isNotBlank()) {
@@ -190,23 +189,23 @@ private fun ProviderBinaryPreviewContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Description,
+            AsteriskIcon(
+                res = Icons.Rounded.Description,
                 contentDescription = null,
                 modifier = Modifier.size(36.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = LocalSmartisanColors.current.accent,
             )
-            Text(
+            SmartisanText(
                 text = stringResource(R.string.mihomo_rule_provider_binary_unavailable),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.body,
+                color = LocalSmartisanColors.current.textSecondary,
                 textAlign = TextAlign.Center,
             )
             if (rawContent.lastError.isNotBlank()) {
-                Text(
+                SmartisanText(
                     text = rawContent.lastError,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.warning,
                     textAlign = TextAlign.Center,
                 )
             }

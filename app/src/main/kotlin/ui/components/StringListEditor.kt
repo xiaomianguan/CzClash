@@ -3,6 +3,11 @@
 
 package ui.components
 
+import ui.components.AsteriskField
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -25,13 +30,10 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -92,27 +94,27 @@ internal fun StringListEditor(
         currentOnPendingChange?.invoke(hasPendingInput)
     }
 
-    Card(
+    SmartisanCard(
         modifier = modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        shape = MaterialTheme.shapes.large,
+        color = LocalSmartisanColors.current.surfaceRaised,
+        shape = LocalSmartisanShapes.current.large,
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                SmartisanText(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = LocalSmartisanTypography.current.listRowPrimary,
+                    color = LocalSmartisanColors.current.textPrimary,
                 )
                 AsteriskInfoChip(text = sanitizedValues.size.toString())
-                IconButton(
+                SmartisanIconButton(
                     onClick = {
                         bulkInput = sanitizedValues.joinToString("\n")
                         showBulkEditor = true
                     },
                 ) {
-                    Icon(Icons.Rounded.EditNote, stringResource(R.string.common_edit_all))
+                    AsteriskIcon(Icons.Rounded.EditNote, stringResource(R.string.common_edit_all))
                 }
             }
             description?.let { StringListStatusText(it) }
@@ -124,7 +126,7 @@ internal fun StringListEditor(
                     supportingText = inputError,
                 )
                 Spacer(Modifier.width(4.dp))
-                IconButton(
+                SmartisanIconButton(
                     enabled = canAdd,
                     onClick = {
                         val result = addStringListValue(
@@ -136,7 +138,7 @@ internal fun StringListEditor(
                         }
                     },
                 ) {
-                    Icon(Icons.Rounded.Add, stringResource(R.string.common_add))
+                    AsteriskIcon(Icons.Rounded.Add, stringResource(R.string.common_add))
                 }
             }
             AnimatedVisibility(
@@ -166,11 +168,11 @@ internal fun StringListEditor(
                     LaunchedEffect(editing) {
                         if (editing) focusRequester.requestFocus()
                     }
-                    Card(
+                    SmartisanCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 6.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                        color = LocalSmartisanColors.current.surfaceRaised,
                         shape = AsteriskShapeTokens.InnerContainer,
                     ) {
                         Column {
@@ -289,9 +291,9 @@ private fun RowScope.StringListItemField(
         val interactionSource = remember { MutableInteractionSource() }
         val focused by interactionSource.collectIsFocusedAsState()
         val borderColor = when {
-            isError -> MaterialTheme.colorScheme.error
-            focused -> MaterialTheme.colorScheme.primary
-            else -> MaterialTheme.colorScheme.outlineVariant
+            isError -> LocalSmartisanColors.current.warning
+            focused -> LocalSmartisanColors.current.accent
+            else -> LocalSmartisanColors.current.rowDivider
         }
         val borderWidth = if (focused) 2.dp else 1.dp
         BasicTextField(
@@ -301,8 +303,8 @@ private fun RowScope.StringListItemField(
                 .heightIn(min = 56.dp)
                 .focusRequester(focusRequester),
             lineLimits = TextFieldLineLimits.SingleLine,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            textStyle = LocalSmartisanTypography.current.body.copy(color = LocalSmartisanColors.current.textPrimary),
+            cursorBrush = SolidColor(LocalSmartisanColors.current.accent),
             interactionSource = interactionSource,
             decorator = { innerTextField ->
                 Box(
@@ -315,7 +317,7 @@ private fun RowScope.StringListItemField(
                             .heightIn(min = 56.dp)
                             .expandHorizontallyBy(StringListItemEditorBorderExtension)
                             .background(
-                                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                color = LocalSmartisanColors.current.surfaceRaised,
                                 shape = AsteriskShapeTokens.InnerContainer,
                             )
                             .border(
@@ -329,13 +331,13 @@ private fun RowScope.StringListItemField(
             },
         )
     } else {
-        Text(
+        SmartisanText(
             text = value,
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textPrimary,
         )
     }
 }
@@ -363,13 +365,13 @@ private fun RowScope.StringListEditableField(
     supportingText: String? = null,
 ) {
     Box(modifier = Modifier.weight(1f)) {
-        OutlinedTextField(
+        AsteriskField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = isError,
-            supportingText = supportingText?.let { message -> ({ Text(message) }) },
+            supportingText = supportingText?.let { message -> ({ SmartisanText(message) }) },
             shape = AsteriskShapeTokens.InnerContainer,
         )
     }
@@ -381,23 +383,23 @@ internal fun StringListStatusText(
     modifier: Modifier = Modifier,
     error: Boolean = false,
 ) {
-    Text(
+    SmartisanText(
         text = text,
         modifier = modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-        style = MaterialTheme.typography.bodySmall,
-        color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+        style = LocalSmartisanTypography.current.listItemSecondary,
+        color = if (error) LocalSmartisanColors.current.warning else LocalSmartisanColors.current.textSecondary,
     )
 }
 
 @Composable
 private fun StringListAction(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: Int,
     description: String,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(48.dp)) {
-        Icon(icon, description)
+    SmartisanIconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(48.dp)) {
+        AsteriskIcon(icon, description)
     }
 }
 
@@ -435,13 +437,13 @@ private fun StringListBulkEditorSheet(
         },
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 24.dp)) {
-            OutlinedTextField(
+            AsteriskField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp).padding(top = 12.dp),
                 minLines = 8,
                 isError = error != null,
-                supportingText = error?.let { message -> ({ Text(message) }) },
+                supportingText = error?.let { message -> ({ SmartisanText(message) }) },
                 shape = AsteriskShapeTokens.InnerContainer,
             )
         }

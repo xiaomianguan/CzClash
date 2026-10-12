@@ -3,6 +3,8 @@
 
 package ui.components
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,8 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ internal fun AsteriskStatusCard(
 ) {
     AsteriskPageCard(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(18.dp),
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             content()
@@ -42,11 +43,11 @@ internal fun AsteriskStatusCard(
                     if (status == null) {
                         Spacer(Modifier.weight(1f))
                     } else {
-                        Text(
+                        SmartisanText(
                             text = status,
                             modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                     }
                     controls()

@@ -3,47 +3,22 @@
 
 package ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import ui.isInDarkTheme
 
 /**
- * Semantic accent slot for a preference-row icon. Each entry holds a paired (background,
- * foreground) color taken from the Material3 reference palette tones `_90` / `_80` (background)
- * and `_30` (foreground). Those tones are the same ones upstream AOSP / crdroid uses for
- * dashboard tiles — see `packages/apps/Settings/res/values/colors.xml` `homepage_*_fg` /
- * `homepage_*_bg` mappings in `android-15+` settingslib; see also the night override at
- * `packages/apps/Settings/res/values-night/colors.xml` which swaps the background tone from
- * `_90` to `_80` while keeping the foreground at `_30`.
+ * Semantic accent slot for a preference-row icon.
  *
- * The pair (bg, fg) is kept together so the per-row color recipe is self-documenting and
- * the light/dark scheme only has to swap background tone, never pick colors.
- *
- * Mapping table (mirrors crdroid's expressive preference tiles):
- * | Accent          | bg light (_90) | bg dark (_80) | fg (_30)   | Used for                              |
- * |-----------------|----------------|---------------|------------|---------------------------------------|
- * | MaskBlue        | #D0E4FF        | #A1C9FF       | #04409F    | Network / general-purpose blue         |
- * | MaskBlueVariant| #BDE9FF        | #67D4FF       | #004D68    | Dns / generic "cool" tone             |
- * | MaskPink       | #FFD8EF        | #FFAEE4       | #8D0053    | Notification / modes / sound          |
- * | MaskOrange     | #FFDCC3        | #FFB683       | #753403    | Display / wallpaper / theme           |
- * | MaskYellow     | #FFE07C        | #FCBD00       | #6D3A01    | Storage / backup / hev-tun            |
- * | MaskGreen      | #BEEFBB        | #80DA88       | #00522C    | Routing / battery / log / ipv6-prefer |
- * | MaskGrey       | #E3E3E3        | #C7C7C7       | #474747    | System / muted / licences             |
- * | MaskRed        | #FFDADC        | #FFB3AE       | #8A1A16    | Safety / alert / blacklist           |
- * | MaskPurple     | #EEDCFE        | #D9BAFD       | #5629A4    | About / modes-hub / accent controls   |
+ * In the Smartisan visual language row icons are flat line art rather than the Material
+ * "dashboard tile" circles used previously, so this now only carries the icon tint.
  */
 @Immutable
 enum class IconAccent(
@@ -51,7 +26,7 @@ enum class IconAccent(
     internal val darkBg: Color,
     internal val lightFg: Color,
 ) {
-    /** Fallback: render using the existing Material `secondaryContainer` swatch. */
+    /** Fallback: render using the theme's secondary text color. */
     Surface(Color.Unspecified, Color.Unspecified, Color.Unspecified),
 
     MaskBlue(Color(0xFFD0E4FF), Color(0xFFA1C9FF), Color(0xFF04409F)),
@@ -66,67 +41,20 @@ enum class IconAccent(
 }
 
 /**
- * Preference-row leading icon: a 40dp circular swatch with a 24dp icon centered inside.
- *
- * Light scheme: swatch = the accent's `_90` pale tint, icon = the accent's `_30` deep hue.
- * Dark  scheme: swatch = the accent's `_80` saturated tone (crdroid swaps `_90` → `_80`
- *               in values-night/colors.xml; the foreground stays `_30` so the icon keeps
- *               its strong saturated identity on top of the bright swatch),
- *               icon    = `_30` at full opacity.
- *
- * Falls through to the legacy Material `secondaryContainer` swatch when [accent] is
- * [IconAccent.Surface], so any preference that hasn't opted in keeps the existing look.
- *
- * Geometry matches upstream AOSP dashboard tile (`dashboard_tile_image_size = 40dp`,
- * `dashboard_tile_foreground_image_size = 24dp`); the padding comes from centering the
- * 24dp icon inside the 40dp circle (8dp inset on every side).
+ * Preference-row leading icon: a flat monochrome 24dp glyph (Smartisan list rows use a
+ * single grey glyph colour rather than per-item hues).
  */
 @Composable
 fun MaskedPreferenceIcon(
-    icon: ImageVector,
-    accent: IconAccent,
+    icon: Int,
+    @Suppress("UNUSED_PARAMETER") accent: IconAccent,
     modifier: Modifier = Modifier,
 ) {
-    if (accent == IconAccent.Surface) {
-        LegacySecondaryContainerIcon(icon = icon, modifier = modifier)
-        return
-    }
-    val darkTheme = isInDarkTheme()
-    val containerColor = if (darkTheme) accent.darkBg else accent.lightBg
-    val contentColor = accent.lightFg
-    Box(
-        modifier = modifier
-            .size(40.dp)
-            .background(color = containerColor, shape = CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun LegacySecondaryContainerIcon(icon: ImageVector, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .size(40.dp)
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = CircleShape,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-            )
-        }
-    }
+    val colors = LocalSmartisanColors.current
+    AsteriskIcon(
+        res = icon,
+        contentDescription = null,
+        tint = colors.textSecondary,
+        modifier = modifier.size(24.dp),
+    )
 }

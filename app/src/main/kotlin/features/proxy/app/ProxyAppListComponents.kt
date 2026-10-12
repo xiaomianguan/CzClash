@@ -3,6 +3,9 @@
 
 package features.proxy.app
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -17,15 +20,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import cc.wuersan008.smartisanx.ui.control.SmartisanButtonTabGroup
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -108,65 +108,65 @@ internal fun ProxyAppListMoreActionsMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Rounded.MoreVert, stringResource(R.string.proxy_app_list_more_actions))
+        SmartisanIconButton(onClick = { expanded = true }) {
+            AsteriskIcon(Icons.Rounded.MoreVert, stringResource(R.string.proxy_app_list_more_actions))
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.proxy_app_list_show_system_apps)) },
+        AsteriskPopupMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.proxy_app_list_show_system_apps)) },
                 onClick = { onAction(ProxyAppListMoreAction.ToggleSystemApps) },
-                leadingIcon = { Icon(Icons.Rounded.Apps, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.Rounded.Apps, contentDescription = null) },
                 trailingIcon = { AsteriskCheckbox(checked = showSystemApps, onCheckedChange = null) },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.proxy_app_list_scan_china_apps)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.proxy_app_list_scan_china_apps)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.ScanChinaApps)
                 },
-                leadingIcon = { Icon(Icons.Rounded.Public, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.Rounded.Public, contentDescription = null) },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.proxy_app_list_invert_selection)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.proxy_app_list_invert_selection)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.InvertSelection)
                 },
                 leadingIcon = {
-                    Icon(Icons.AutoMirrored.Rounded.CompareArrows, contentDescription = null)
+                    AsteriskIcon(Icons.AutoMirrored.Rounded.CompareArrows, contentDescription = null)
                 },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.proxy_app_list_clear_selection)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.proxy_app_list_clear_selection)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.ClearSelection)
                 },
-                leadingIcon = { Icon(Icons.Rounded.Remove, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.Rounded.Remove, contentDescription = null) },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.common_import_from_clipboard)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.common_import_from_clipboard)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.ImportClipboard)
                 },
-                leadingIcon = { Icon(Icons.Rounded.FileDownload, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.Rounded.FileDownload, contentDescription = null) },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.common_export_to_clipboard)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.common_export_to_clipboard)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.ExportClipboard)
                 },
-                leadingIcon = { Icon(Icons.Rounded.FileUpload, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.Rounded.FileUpload, contentDescription = null) },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.proxy_app_list_help)) },
+            AsteriskPopupMenuItem(
+                text = { SmartisanText(stringResource(R.string.proxy_app_list_help)) },
                 onClick = {
                     expanded = false
                     onAction(ProxyAppListMoreAction.Help)
                 },
-                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Help, contentDescription = null) },
+                leadingIcon = { AsteriskIcon(Icons.AutoMirrored.Rounded.Help, contentDescription = null) },
             )
         }
     }
@@ -181,24 +181,12 @@ internal fun ProxyAppListModeSegmentedRow(
     modifier: Modifier = Modifier,
 ) {
     val safeIndex = if (selectedIndex in modes.indices) selectedIndex else 0
-    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
-        modes.forEachIndexed { index, mode ->
-            SegmentedButton(
-                selected = safeIndex == index,
-                onClick = { onSelectedIndexChange(index) },
-                // Keep unavailable modes tappable so an attempt can show a brief tip.
-                modifier = Modifier.graphicsLayer {
-                    alpha = if (requiresGlobalProxyAppMode && index != ProxyAppListModeGlobal) 0.38f else 1f
-                },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = modes.size,
-                ),
-            ) {
-                Text(mode)
-            }
-        }
-    }
+    SmartisanButtonTabGroup(
+        items = modes,
+        selectedIndex = safeIndex,
+        onSelectedChange = onSelectedIndexChange,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -225,9 +213,9 @@ internal fun ProxyAppListItemCard(
             .padding(bottom = 12.dp),
         enabled = enabled,
         containerColor = if (app.system) {
-            MaterialTheme.colorScheme.surfaceContainerHigh
+            LocalSmartisanColors.current.surfaceRaised
         } else {
-            MaterialTheme.colorScheme.surfaceContainerLow
+            LocalSmartisanColors.current.surface
         },
     ) {
         Row(
@@ -245,18 +233,18 @@ internal fun ProxyAppListItemCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
+                    SmartisanText(
                         text = app.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = LocalSmartisanTypography.current.listItemPrimary,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Text(
+                    SmartisanText(
                         text = stringResource(R.string.proxy_app_list_entry_summary)
                             .formatTemplate("package" to app.packageName),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -286,10 +274,10 @@ internal fun ProxyAppListEmptyState(
             .padding(vertical = 28.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        SmartisanText(
             text = stringResource(R.string.common_empty),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -318,12 +306,12 @@ private fun AppIcon(
     val backgroundColor by animateColorAsState(
         targetValue = if (enabled) {
             if (app.system) {
-                MaterialTheme.colorScheme.secondaryContainer
+                LocalSmartisanColors.current.surfaceRaised
             } else {
-                MaterialTheme.colorScheme.primaryContainer
+                LocalSmartisanColors.current.selectionBackground
             }
         } else {
-            MaterialTheme.colorScheme.surfaceContainerHighest
+            LocalSmartisanColors.current.surfaceRaised
         },
         animationSpec = AsteriskMotion.effects(),
         label = "per-app-icon-background",

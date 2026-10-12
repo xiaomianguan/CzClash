@@ -3,6 +3,8 @@
 
 package features.settings.sheets
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.os.Build
 import app.ServiceControlKeyguardRule
 import app.supportsKeyguardControl
@@ -13,8 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -130,10 +131,10 @@ internal fun ServiceControlBottomSheet(
                     label = "service-control-schedule",
                 ) {
                     ServiceControlSection(stringResource(R.string.settings_service_control_schedule)) {
-                        Text(
+                        SmartisanText(
                             text = stringResource(R.string.settings_service_control_cron_hint),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.listItemSecondary,
+                            color = LocalSmartisanColors.current.textSecondary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         )
                         SettingsTextField(
@@ -214,17 +215,17 @@ internal fun ServiceControlBottomSheet(
                     exit = AsteriskMotion.contentExit(),
                     label = "service-control-runtime-error",
                 ) {
-                    Text(
+                    SmartisanText(
                         text = runtimeError.orEmpty(),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
+                        color = LocalSmartisanColors.current.warning,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
                         modifier = Modifier.padding(16.dp),
                     )
                 }
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.settings_service_control_doze_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -334,10 +335,10 @@ private fun ServiceControlSection(
     content: @Composable () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleSmall,
+            color = LocalSmartisanColors.current.accent,
+            style = LocalSmartisanTypography.current.listRowPrimary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
         content()

@@ -3,17 +3,20 @@
 
 package features.logs
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,21 +37,21 @@ internal fun LogEmptyCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.secondaryContainer,
+        SmartisanSurface(
+            shape = LocalSmartisanShapes.current.medium,
+            color = LocalSmartisanColors.current.surfaceRaised,
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.Article,
+            AsteriskIcon(
+                res = Icons.AutoMirrored.Rounded.Article,
                 contentDescription = null,
                 modifier = Modifier.padding(18.dp),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = LocalSmartisanColors.current.textPrimary,
             )
         }
-        Text(
+        SmartisanText(
             text = stringResource(R.string.common_empty),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.listItemPrimary,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -59,10 +62,11 @@ internal fun LogEntryCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    SmartisanCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .smartisanClickable(onClick = onClick),
+        color = LocalSmartisanColors.current.surface,
     ) {
         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Row(
@@ -70,17 +74,17 @@ internal fun LogEntryCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                SmartisanText(
                     text = formatCoreLogTime(entry.timestampMillis),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
                 LogLevelChip(entry.level)
             }
-            Text(
+            SmartisanText(
                 text = entry.message,
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-                color = MaterialTheme.colorScheme.onSurface,
+                style = LocalSmartisanTypography.current.body.copy(fontFamily = FontFamily.Monospace),
+                color = LocalSmartisanColors.current.textPrimary,
                 modifier = Modifier.padding(top = 8.dp),
             )
         }

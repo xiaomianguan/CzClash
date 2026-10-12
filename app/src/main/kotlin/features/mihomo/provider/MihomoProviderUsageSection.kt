@@ -3,6 +3,8 @@
 
 package features.mihomo.provider
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -15,12 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import ui.components.AsteriskSpinner
+import cc.wuersan008.smartisanx.ui.basic.SmartisanDivider
+import ui.components.AsteriskProgressBar
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -101,7 +102,7 @@ private fun MihomoProviderUsageVisibleContent(
             .fillMaxWidth()
             .padding(top = 12.dp, end = 8.dp),
     ) {
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        SmartisanDivider(color = LocalSmartisanColors.current.rowDivider)
         AnimatedContent(
             targetState = state,
             transitionSpec = AsteriskMotion.fadeThrough(
@@ -142,15 +143,14 @@ private fun MihomoProviderUsageLoading() {
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(18.dp),
-            strokeWidth = 2.dp,
-        )
+        AsteriskSpinner(
+            size = 18.dp,
+            )
         Spacer(modifier = Modifier.width(10.dp))
-        Text(
+        SmartisanText(
             text = stringResource(R.string.mihomo_profile_provider_usage_loading),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -171,16 +171,16 @@ private fun MihomoProviderUsageMessage(
             .fillMaxWidth()
             .padding(vertical = 12.dp),
     ) {
-        Text(
+        SmartisanText(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = LocalSmartisanTypography.current.body,
+            color = LocalSmartisanColors.current.textSecondary,
         )
         if (supportingText != null) {
-            Text(
+            SmartisanText(
                 text = supportingText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.accent,
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
@@ -250,13 +250,13 @@ private fun MihomoProviderUsageReady(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                SmartisanText(
                     text = stringResource(R.string.mihomo_profile_provider_usage_title),
-                    style = MaterialTheme.typography.titleSmall,
+                    style = LocalSmartisanTypography.current.listRowPrimary,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                 )
-                Text(
+                SmartisanText(
                     text = listOfNotNull(
                         pluralStringResource(
                             R.plurals.mihomo_profile_provider_usage_count,
@@ -265,38 +265,36 @@ private fun MihomoProviderUsageReady(
                         ),
                         meteredSummary,
                     ).joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 2.dp),
                 )
                 if (statusSummary.isNotBlank()) {
-                    Text(
+                    SmartisanText(
                         text = statusSummary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp),
                     )
                 }
                 if (summary.totalBytes > 0L) {
-                    LinearProgressIndicator(
-                        progress = { summary.progress },
+                    AsteriskProgressBar(
+                        progress =  summary.progress ,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp)
                             .height(5.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primaryContainer,
                     )
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
             AsteriskExpansionIndicator(
                 expanded = expanded,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = LocalSmartisanColors.current.textSecondary,
             )
         }
 
@@ -309,11 +307,11 @@ private fun MihomoProviderUsageReady(
                 summary.items.forEach { item ->
                     MihomoProviderUsageItemRow(item)
                 }
-                TextButton(
+                AsteriskLinkButton(
                     onClick = onOpenDetails,
                     modifier = Modifier.align(Alignment.End),
                 ) {
-                    Text(stringResource(R.string.mihomo_profile_provider_usage_open_details))
+                    SmartisanText(stringResource(R.string.mihomo_profile_provider_usage_open_details))
                 }
             }
         }
@@ -346,42 +344,40 @@ private fun MihomoProviderUsageItemRow(
             .fillMaxWidth()
             .padding(bottom = 12.dp),
     ) {
-        Text(
+        SmartisanText(
             text = item.name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = LocalSmartisanTypography.current.body,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = LocalSmartisanColors.current.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Text(
+        SmartisanText(
             text = status,
-            style = MaterialTheme.typography.bodySmall,
+            style = LocalSmartisanTypography.current.listItemSecondary,
             color = if (item.kind == MihomoProviderUsageKind.Unavailable) {
-                MaterialTheme.colorScheme.error
+                LocalSmartisanColors.current.warning
             } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
+                LocalSmartisanColors.current.textSecondary
             },
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 2.dp),
         )
         if (item.kind == MihomoProviderUsageKind.Metered) {
-            LinearProgressIndicator(
-                progress = { item.progress },
+            AsteriskProgressBar(
+                progress =  item.progress ,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 6.dp)
                     .height(4.dp),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.primaryContainer,
             )
         }
         if (
             item.kind == MihomoProviderUsageKind.Metered ||
             item.kind == MihomoProviderUsageKind.Unlimited
         ) {
-            Text(
+            SmartisanText(
                 text = if (item.expireAtSeconds > 0L) {
                     stringResource(
                         R.string.mihomo_profile_provider_usage_expires,
@@ -390,8 +386,8 @@ private fun MihomoProviderUsageItemRow(
                 } else {
                     stringResource(R.string.mihomo_profile_provider_usage_no_expiry)
                 },
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.listItemCaptionSmall,
+                color = LocalSmartisanColors.current.textSecondary,
                 modifier = Modifier.padding(top = 3.dp),
             )
         }

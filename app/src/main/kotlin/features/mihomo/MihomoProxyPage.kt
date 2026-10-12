@@ -3,6 +3,12 @@
 
 package features.mihomo
 
+import cc.wuersan008.smartisanx.ui.control.SmartisanTextButton
+import ui.components.AsteriskEmptyState
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanSurface
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import ui.isInDarkTheme
 import ui.components.AsteriskSearchTopAppBar
 import ui.components.AsteriskTopBarControls
@@ -30,17 +36,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskSpinner
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanDivider
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
+import ui.components.AsteriskProgressBar
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -366,14 +370,14 @@ fun MihomoProxyPage(
                     onQueryChange = { searchQuery = it },
                     placeholder = stringResource(R.string.mihomo_proxies_search),
                     searchAvailable = hasProfiles,
-                    title = { Text(stringResource(R.string.mihomo_proxies_title)) },
+                    title = { SmartisanText(stringResource(R.string.mihomo_proxies_title)) },
                     actions = {
                         if (hasProviders) {
-                            IconButton(
+                            SmartisanIconButton(
                                 onClick = { navigator.push(Route.MihomoProviderManagement) },
                             ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.FolderOpen,
+                                AsteriskIcon(
+                                    res = Icons.Rounded.FolderOpen,
                                     contentDescription = stringResource(R.string.mihomo_provider_management_title),
                                 )
                             }
@@ -418,7 +422,7 @@ fun MihomoProxyPage(
             outerPadding = padding,
             isWideScreen = isWideScreen,
         )
-        val listPadding = pageListPadding(contentPadding, bottomExtra = 104.dp)
+        val listPadding = pageListPadding(contentPadding, bottomExtra = 16.dp)
 
         Box {
             HorizontalPager(
@@ -530,11 +534,11 @@ fun MihomoProxyPage(
                 }
             }
             if (loadingPresentation == MihomoProxyLoadingPresentation.ContentRefresh) {
-                LinearProgressIndicator(
+                AsteriskSpinner(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .fillMaxWidth()
                         .padding(top = contentPadding.calculateTopPadding()),
+                    size = 28.dp,
                 )
             }
             selectedGroup?.let { group ->
@@ -668,10 +672,10 @@ private fun MihomoProxyOptionsMenu(
     val menuSizeMotion = AsteriskMotion.fastSpatial<IntSize>()
     val menuEffectsMotion = AsteriskMotion.fastEffects<Float>()
     Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Rounded.MoreVert, stringResource(R.string.mihomo_proxies_options))
+        SmartisanIconButton(onClick = { expanded = true }) {
+            AsteriskIcon(Icons.Rounded.MoreVert, stringResource(R.string.mihomo_proxies_options))
         }
-        DropdownMenu(
+        AsteriskPopupMenu(
             expanded = expanded,
             onDismissRequest = dismissMenu,
             modifier = Modifier.width(MihomoProxyOptionsMenuWidth),
@@ -692,10 +696,10 @@ private fun MihomoProxyOptionsMenu(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     when (currentLevel) {
                 ProxyOptionsLevel.Main -> {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.mihomo_proxies_option_filter_not_selectable)) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.mihomo_proxies_option_filter_not_selectable)) },
                         onClick = { onExcludeNotSelectableChange(!excludeNotSelectable) },
-                        leadingIcon = { Icon(Icons.Rounded.FilterAlt, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.FilterAlt, contentDescription = null) },
                         trailingIcon = {
                             AsteriskCheckbox(
                                 checked = excludeNotSelectable,
@@ -703,46 +707,46 @@ private fun MihomoProxyOptionsMenu(
                             )
                         },
                     )
-                    HorizontalDivider()
-                    DropdownMenuItem(
+                    SmartisanDivider()
+                    AsteriskPopupMenuItem(
                         text = {
                             Column {
-                                Text(stringResource(R.string.mihomo_proxies_option_layout))
-                                Text(
+                                SmartisanText(stringResource(R.string.mihomo_proxies_option_layout))
+                                SmartisanText(
                                     layoutLabel,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = LocalSmartisanTypography.current.listItemSecondary,
+                                    color = LocalSmartisanColors.current.textSecondary,
                                 )
                             }
                         },
                         onClick = { level = ProxyOptionsLevel.Layout },
-                        leadingIcon = { Icon(Icons.Rounded.ViewModule, contentDescription = null) },
-                        trailingIcon = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.ViewModule, contentDescription = null) },
+                        trailingIcon = { AsteriskIcon(Icons.Rounded.ChevronRight, contentDescription = null) },
                     )
-                    DropdownMenuItem(
+                    AsteriskPopupMenuItem(
                         text = {
                             Column {
-                                Text(stringResource(R.string.mihomo_proxies_option_sort))
-                                Text(
+                                SmartisanText(stringResource(R.string.mihomo_proxies_option_sort))
+                                SmartisanText(
                                     sortLabel,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = LocalSmartisanTypography.current.listItemSecondary,
+                                    color = LocalSmartisanColors.current.textSecondary,
                                 )
                             }
                         },
                         onClick = { level = ProxyOptionsLevel.Sort },
-                        leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Sort, contentDescription = null) },
-                        trailingIcon = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.AutoMirrored.Rounded.Sort, contentDescription = null) },
+                        trailingIcon = { AsteriskIcon(Icons.Rounded.ChevronRight, contentDescription = null) },
                     )
                 }
 
                 ProxyOptionsLevel.Layout -> {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.mihomo_proxies_option_layout)) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.mihomo_proxies_option_layout)) },
                         onClick = { level = ProxyOptionsLevel.Main },
-                        leadingIcon = { Icon(Icons.Rounded.ChevronLeft, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.ChevronLeft, contentDescription = null) },
                     )
-                    HorizontalDivider()
+                    SmartisanDivider()
                     listOf(
                         Triple(
                             MihomoProxyLayoutAuto,
@@ -777,12 +781,12 @@ private fun MihomoProxyOptionsMenu(
                 }
 
                 ProxyOptionsLevel.Sort -> {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.mihomo_proxies_option_sort)) },
+                    AsteriskPopupMenuItem(
+                        text = { SmartisanText(stringResource(R.string.mihomo_proxies_option_sort)) },
                         onClick = { level = ProxyOptionsLevel.Main },
-                        leadingIcon = { Icon(Icons.Rounded.ChevronLeft, contentDescription = null) },
+                        leadingIcon = { AsteriskIcon(Icons.Rounded.ChevronLeft, contentDescription = null) },
                     )
-                    HorizontalDivider()
+                    SmartisanDivider()
                     listOf(
                         Triple(
                             MihomoProxySortDefault,
@@ -847,28 +851,28 @@ private fun MihomoProxyNodeCard(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(
+                SmartisanText(
                     text = node.title.ifBlank { node.name },
                     modifier = Modifier.weight(1f),
                     style = if (compact) {
-                        MaterialTheme.typography.titleSmall.copy(
+                        LocalSmartisanTypography.current.listRowPrimary.copy(
                             fontSize = 13.sp,
                             lineHeight = 17.sp,
                         )
                     } else {
-                        MaterialTheme.typography.titleMedium
+                        LocalSmartisanTypography.current.listItemPrimary
                     },
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = LocalSmartisanColors.current.textPrimary,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (selected) {
-                    Icon(
-                        imageVector = Icons.Rounded.CheckCircle,
+                    AsteriskIcon(
+                        res = Icons.Rounded.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = LocalSmartisanColors.current.accent,
                     )
                 }
             }
@@ -942,20 +946,20 @@ private fun ProtocolDelayLine(
                     modifier = Modifier.weight(1f, fill = false),
                     emphasized = selected,
                     textStyle = if (compact) {
-                        MaterialTheme.typography.labelSmall.copy(
+                        LocalSmartisanTypography.current.listItemCaptionSmall.copy(
                             fontSize = 10.sp,
                             lineHeight = 14.sp,
                         )
                     } else {
-                        MaterialTheme.typography.labelSmall
+                        LocalSmartisanTypography.current.listItemCaptionSmall
                     },
                 )
                 if (providerName.isNotBlank()) {
-                    Text(
+                    SmartisanText(
                         text = providerName,
                         modifier = Modifier.padding(start = 6.dp).weight(1f, fill = false),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = LocalSmartisanTypography.current.listItemCaptionSmall,
+                        color = LocalSmartisanColors.current.textSecondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -966,20 +970,19 @@ private fun ProtocolDelayLine(
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 if (testing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.5.dp,
-                    )
+                    AsteriskSpinner(
+                        size = 20.dp,
+                        )
                 } else {
-                    Text(
+                    SmartisanText(
                         text = delayText,
                         style = if (compact) {
-                            MaterialTheme.typography.labelSmall.copy(
+                            LocalSmartisanTypography.current.listItemCaptionSmall.copy(
                                 fontSize = 10.sp,
                                 lineHeight = 14.sp,
                             )
                         } else {
-                            MaterialTheme.typography.labelMedium
+                            LocalSmartisanTypography.current.listItemSecondary
                         },
                         fontWeight = FontWeight.Medium,
                         color = delayColor(delay, delayStatus),
@@ -995,13 +998,13 @@ private fun ProtocolDelayLine(
 
 @Composable
 private fun MihomoProxyEmptyCard() {
-    Text(
+    SmartisanText(
         text = stringResource(R.string.common_empty),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 16.dp),
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = LocalSmartisanColors.current.textSecondary,
     )
 }
 
@@ -1009,46 +1012,17 @@ private fun MihomoProxyEmptyCard() {
 private fun MihomoProxyNoConfigurationCard(
     onAddConfiguration: () -> Unit,
 ) {
-    AsteriskPageCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = ui.theme.AsteriskShapeTokens.SmallContainer,
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Rounded.Description,
-                        contentDescription = null,
-                    )
-                }
-            }
-            Text(
-                text = stringResource(R.string.mihomo_proxies_no_profile_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(R.string.mihomo_proxies_no_profile_summary),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            AsteriskTonalButton(
+    AsteriskEmptyState(
+        title = stringResource(R.string.mihomo_proxies_no_profile_title),
+        description = stringResource(R.string.mihomo_proxies_no_profile_summary),
+        modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+        action = {
+            SmartisanTextButton(
                 text = stringResource(R.string.mihomo_profile_add),
-                icon = Icons.Rounded.Add,
                 onClick = onAddConfiguration,
-                modifier = Modifier.align(Alignment.End),
             )
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -1060,13 +1034,12 @@ private fun MihomoProxyLoadingCard() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(28.dp),
-            strokeWidth = 3.dp,
-        )
-        Text(
+        AsteriskSpinner(
+            size = 28.dp,
+            )
+        SmartisanText(
             text = stringResource(R.string.mihomo_proxies_loading),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = LocalSmartisanColors.current.textSecondary,
         )
     }
 }
@@ -1076,7 +1049,7 @@ private fun delayColor(delay: Int?, status: MihomoDelayStatus?): Color {
     val darkTheme = isInDarkTheme()
     return when {
         status == MihomoDelayStatus.Timeout || status == MihomoDelayStatus.Failed -> if (darkTheme) Color(0xFFF12522) else Color(0xFFE94634)
-        status == null || delay == null -> MaterialTheme.colorScheme.onSurfaceVariant
+        status == null || delay == null -> LocalSmartisanColors.current.textSecondary
         delay < 0 -> if (darkTheme) Color(0xFFF12522) else Color(0xFFE94634)
         delay < 100 -> if (darkTheme) Color(0xFF6BD58A) else Color(0xFF128A3C)
         delay < 200 -> if (darkTheme) Color(0xFFFFC857) else Color(0xFFD18A00)

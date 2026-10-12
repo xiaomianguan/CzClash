@@ -3,6 +3,7 @@
 
 package features.about
 
+import ui.components.AsteriskIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,13 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import ui.icons.AsteriskIcons as Icons
-import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
 import ui.components.AsteriskSearchTopAppBar
 import ui.components.AsteriskScaffold
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.CircularProgressIndicator
+import ui.components.AsteriskLinkButton
+import ui.components.AsteriskSpinner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -77,11 +78,11 @@ fun LicensePage(
                     query = query,
                     onQueryChange = { query = it },
                     placeholder = stringResource(R.string.common_search),
-                    title = { Text(stringResource(R.string.license_title)) },
+                    title = { SmartisanText(stringResource(R.string.license_title)) },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        SmartisanIconButton(onClick = { navigator.pop() }) {
+                            AsteriskIcon(
+                                res = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = stringResource(R.string.common_back),
                             )
                         }
@@ -117,7 +118,7 @@ fun LicensePage(
                 is LicenseLoadState.Ready -> {
                     if (visibleLibraries.isEmpty()) {
                         item(key = "license_empty") {
-                            Text(
+                            SmartisanText(
                                 text = stringResource(R.string.common_empty),
                                 modifier = Modifier.fillMaxWidth().padding(32.dp),
                             )
@@ -147,12 +148,11 @@ private fun LicenseLoadStatus(
         status = summary,
         controls = {
             when (loadState) {
-                LicenseLoadState.Loading -> CircularProgressIndicator(
+                LicenseLoadState.Loading -> AsteriskSpinner(
                     modifier = Modifier.padding(10.dp),
-                    strokeWidth = 2.5.dp,
-                )
-                is LicenseLoadState.Failed -> TextButton(onClick = onRetry) {
-                    Text(stringResource(R.string.common_retry))
+                    )
+                is LicenseLoadState.Failed -> AsteriskLinkButton(onClick = onRetry) {
+                    SmartisanText(stringResource(R.string.common_retry))
                 }
                 is LicenseLoadState.Ready -> Unit
             }

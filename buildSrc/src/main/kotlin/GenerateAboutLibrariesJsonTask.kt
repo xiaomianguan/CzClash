@@ -76,6 +76,15 @@ abstract class GenerateAboutLibrariesJsonTask : DefaultTask() {
         )
         val bundledRuntimeLibraries = listOf(
             library(
+                "github:xiaomianguan/smartisanx",
+                null,
+                "smartisanx",
+                "Smartisan OS (锤子) style Jetpack Compose component library used for this app's entire UI.",
+                "https://github.com/xiaomianguan/smartisanx",
+                "https://github.com/xiaomianguan/smartisanx",
+                listOf("Apache-2.0"),
+            ),
+            library(
                 "npm:js-beautify",
                 "2.0.3",
                 "JS Beautify",

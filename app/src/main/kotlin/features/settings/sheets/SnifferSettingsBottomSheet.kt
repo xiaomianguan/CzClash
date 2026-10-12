@@ -3,6 +3,7 @@
 
 package features.settings.sheets
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,8 +31,7 @@ import engine.mihomo.sanitizedSnifferDomainRules
 import engine.mihomo.sanitizedSnifferPorts
 import engine.network.isCidrAddress
 import features.settings.SnifferSettingsDraft
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.components.StringListEditor
 import utils.toTrimmedNonEmptyDistinctList
 
@@ -255,9 +254,9 @@ private fun SnifferSheetSection(
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.primary,
+            color = LocalSmartisanColors.current.accent,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -274,7 +273,7 @@ private fun SnifferProtocolFields(
     ports: List<String>,
     onPortsChange: (List<String>) -> Unit,
     overrideTitle: String,
-    overrideIcon: ImageVector,
+    overrideIcon: Int,
     overrideMode: Int,
     overrideOptions: List<String>,
     onOverrideModeChange: (Int) -> Unit,

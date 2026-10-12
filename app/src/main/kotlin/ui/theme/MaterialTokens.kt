@@ -2,34 +2,21 @@ package ui.theme
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-internal val AsteriskShapes = Shapes(
-    extraSmall = AsteriskShapeTokens.ExtraSmallContainer,
-    small = AsteriskShapeTokens.SmallContainer,
-    medium = AsteriskShapeTokens.InnerContainer,
-    large = AsteriskShapeTokens.ListCard,
-    extraLarge = AsteriskShapeTokens.PageCard,
-    largeIncreased = AsteriskShapeTokens.PageCard,
-    extraLargeIncreased = AsteriskShapeTokens.HeroContainer,
-    extraExtraLarge = AsteriskShapeTokens.HeroContainer,
-)
-
-internal val AsteriskTypography = Typography()
-
 internal object AsteriskShapeTokens {
-    val ExtraSmallContainerRadius = 12.dp
-    val SmallContainerRadius = 16.dp
-    val InnerContainerRadius = 20.dp
-    val ListCardRadius = 24.dp
-    val PageCardRadius = 24.dp
-    val SheetRadius = 24.dp
-    val HeroContainerRadius = 24.dp
+    // Smartisan is a square, right-angled design language: cards, rows and chips keep
+    // only a hairline rounding.
+    val ExtraSmallContainerRadius = 2.dp
+    val SmallContainerRadius = 4.dp
+    val InnerContainerRadius = 4.dp
+    val ListCardRadius = 2.dp
+    val PageCardRadius = 2.dp
+    val SheetRadius = 10.dp
+    val HeroContainerRadius = 8.dp
 
     val ExtraSmallContainer = RoundedCornerShape(ExtraSmallContainerRadius)
     val SmallContainer = RoundedCornerShape(SmallContainerRadius)

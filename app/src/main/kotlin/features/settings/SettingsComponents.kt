@@ -3,6 +3,14 @@
 
 package features.settings
 
+import cc.wuersan008.smartisanx.ui.layout.SmartisanListItem
+import cc.wuersan008.smartisanx.ui.layout.SmartisanSectionTitle
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanShapes
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,12 +23,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.control.SmartisanSwitch
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -30,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -63,7 +67,7 @@ internal fun ArrowPreference(
     title: String,
     onClick: () -> Unit,
     summary: String = "",
-    icon: ImageVector = Icons.Rounded.Tune,
+    icon: Int = Icons.Rounded.Tune,
     accent: IconAccent = IconAccent.Surface,
 ) = SettingsActionRow(title = title, summary = summary, icon = icon, onClick = onClick, accent = accent)
 
@@ -73,7 +77,7 @@ internal fun SwitchPreference(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     summary: String = "",
-    icon: ImageVector = Icons.Rounded.Tune,
+    icon: Int = Icons.Rounded.Tune,
     accent: IconAccent = IconAccent.Surface,
 ) = SettingsSwitchRow(
     accent = accent,
@@ -91,7 +95,7 @@ internal fun OverlayDropdownPreference(
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
     summary: String = "",
-    icon: ImageVector = Icons.Rounded.Tune,
+    icon: Int = Icons.Rounded.Tune,
     accent: IconAccent = IconAccent.Surface,
 ) = SettingsDropdownRow(
     accent = accent,
@@ -118,13 +122,8 @@ internal fun SettingsRawConfigProvider(
 
 @Composable
 internal fun SettingsSectionTitle(text: String) {
-    Text(
-        text = text,
-        modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelLarge,
-        fontWeight = FontWeight.SemiBold,
-    )
+    // Library group title: grey, with its own top/bottom rhythm.
+    SmartisanSectionTitle(text = text)
 }
 
 @Composable
@@ -133,12 +132,11 @@ internal fun SettingsSectionCard(
     bottomPadding: Dp = 12.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
+    SmartisanGroup(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = bottomPadding),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        shape = MaterialTheme.shapes.extraLarge,
+        position = SmartisanGroupRowPosition.Single,
     ) {
         Column(content = content)
     }
@@ -147,7 +145,7 @@ internal fun SettingsSectionCard(
 @Composable
 internal fun SettingsActionRow(
     title: String,
-    icon: ImageVector,
+    icon: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     summary: String = "",
@@ -161,12 +159,12 @@ internal fun SettingsActionRow(
         icon = icon,
         summary = summary,
         value = value,
-        modifier = modifier.clickable(role = Role.Button, onClick = onClick),
+        modifier = modifier,
+        onClick = onClick,
         trailing = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+            AsteriskIcon(
+                res = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )
@@ -175,7 +173,7 @@ internal fun SettingsActionRow(
 @Composable
 internal fun SettingsSwitchRow(
     title: String,
-    icon: ImageVector,
+    icon: Int,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -189,11 +187,11 @@ internal fun SettingsSwitchRow(
         title = title,
         icon = icon,
         summary = summary,
-        modifier = modifier.clickable(enabled = enabled, role = Role.Switch) {
-            onCheckedChange(!checked)
-        },
+        modifier = modifier,
+        enabled = enabled,
+        onClick = { onCheckedChange(!checked) },
         trailing = {
-            Switch(
+            SmartisanSwitch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 enabled = enabled,
@@ -205,7 +203,7 @@ internal fun SettingsSwitchRow(
 @Composable
 internal fun SettingsDropdownRow(
     title: String,
-    icon: ImageVector,
+    icon: Int,
     items: List<String>,
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
@@ -219,35 +217,33 @@ internal fun SettingsDropdownRow(
     val value = items[safeIndex]
     if (!settingsRowMatchesQuery(title, summary, value, items)) return
     var expanded by remember { mutableStateOf(false) }
-    Box(modifier = modifier.fillMaxWidth()) {
-        SettingsRow(
-            accent = accent,
-            horizontalPadding = horizontalPadding,
-            title = title,
-            icon = icon,
-            summary = summary,
-            value = value,
-            modifier = Modifier.clickable(role = Role.DropdownList) { expanded = !expanded },
-            trailing = {
-                AsteriskDropdownAnchor(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    menuModifier = Modifier.widthIn(min = 180.dp, max = 280.dp),
-                ) {
-                    items.forEachIndexed { index, item ->
-                        AsteriskDropdownMenuItem(
-                            text = item,
-                            selected = index == safeIndex,
-                            onClick = {
-                                expanded = false
-                                onSelectedIndexChange(index)
-                            },
-                        )
-                    }
+    SettingsRow(
+        accent = accent,
+        title = title,
+        icon = icon,
+        summary = summary,
+        value = value,
+        modifier = modifier,
+        onClick = { expanded = !expanded },
+        trailing = {
+            AsteriskDropdownAnchor(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                menuModifier = Modifier.widthIn(min = 180.dp, max = 280.dp),
+            ) {
+                items.forEachIndexed { index, item ->
+                    AsteriskDropdownMenuItem(
+                        text = item,
+                        selected = index == safeIndex,
+                        onClick = {
+                            expanded = false
+                            onSelectedIndexChange(index)
+                        },
+                    )
                 }
-            },
-        )
-    }
+            }
+        },
+    )
 }
 
 @Composable
@@ -256,7 +252,7 @@ internal fun SettingsReadOnlyRow(
     value: String,
     source: String,
     modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.Rounded.Lock,
+    icon: Int = Icons.Rounded.Lock,
     summary: String = "",
     accent: IconAccent = IconAccent.Surface,
 ) {
@@ -269,10 +265,10 @@ internal fun SettingsReadOnlyRow(
         value = value,
         modifier = modifier.semantics { contentDescription = "$title，$value，$source" },
         trailing = {
-            Text(
+            SmartisanText(
                 text = source,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
+                style = LocalSmartisanTypography.current.listItemSecondary,
+                color = LocalSmartisanColors.current.accent,
             )
         },
     )
@@ -281,58 +277,44 @@ internal fun SettingsReadOnlyRow(
 @Composable
 private fun SettingsRow(
     title: String,
-    icon: ImageVector,
-    modifier: Modifier,
+    icon: Int,
+    modifier: Modifier = Modifier,
     summary: String = "",
     value: String = "",
     trailing: (@Composable () -> Unit)? = null,
     accent: IconAccent = IconAccent.Surface,
-    horizontalPadding: Dp = 16.dp,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .padding(horizontal = horizontalPadding, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MaskedPreferenceIcon(icon = icon, accent = accent)
-        Spacer(Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            if (summary.isNotBlank()) {
-                Text(
-                    text = summary,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
+    // Use the library list row verbatim (60dp leading slot, 15sp/12.5sp text, 6dp trailing
+    // margin); the section's group card provides the background texture, so the row itself
+    // is transparent.
+    SmartisanListItem(
+        title = title,
+        modifier = modifier,
+        summary = summary.ifBlank { null },
+        leading = { MaskedPreferenceIcon(icon = icon, accent = accent) },
+        trailing = if (value.isNotBlank() || trailing != null) {
+            {
+                if (value.isNotBlank()) {
+                    SmartisanText(
+                        text = value,
+                        modifier = Modifier.widthIn(max = SettingsTrailingValueMaxWidth),
+                        style = LocalSmartisanTypography.current.listItemSecondary,
+                        color = LocalSmartisanColors.current.textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                trailing?.invoke()
             }
-        }
-        if (value.isNotBlank()) {
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = value,
-                modifier = Modifier.widthIn(max = SettingsTrailingValueMaxWidth),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        if (trailing != null) {
-            Spacer(Modifier.width(8.dp))
-            trailing()
-        }
-    }
+        } else {
+            null
+        },
+        enabled = enabled,
+        rowBackgroundRes = null,
+        onClick = onClick,
+    )
 }
 
 @Composable

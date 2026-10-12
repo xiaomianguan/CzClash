@@ -3,7 +3,7 @@
          Keep section and resource order aligned across translations and sibling apps. -->
 
     <!-- Common -->
-    <string name="app_name">AsteriskMETA</string>
+    <string name="app_name">CzClash</string>
     <string name="code_editor_format_content_changed">格式化期间内容已修改，请重新点击格式化</string>
     <string name="code_editor_format_failed">格式化失败，请检查语法后重试</string>
     <string name="code_editor_format_javascript">格式化 JavaScript</string>
@@ -150,14 +150,14 @@
     <string name="monitor_resource_cpu">进程 CPU</string>
     <string name="monitor_resource_cpu_peak">CPU 峰值</string>
     <string name="monitor_resource_details">采样详情</string>
-    <string name="monitor_resource_embedded_explanation">CPU 包含同一进程内的 Mihomo 与 AsteriskMETA 开销，不能与 Root 模式直接横向比较。</string>
+    <string name="monitor_resource_embedded_explanation">CPU 包含同一进程内的 Mihomo 与 CzClash 开销，不能与 Root 模式直接横向比较。</string>
     <string name="monitor_resource_focus_memory">内存 %1$s</string>
     <string name="monitor_resource_interval">采样间隔</string>
     <string name="monitor_resource_memory">Mihomo 内存</string>
     <string name="monitor_resource_memory_peak">内存峰值</string>
     <string name="monitor_resource_pid">进程 PID</string>
     <string name="monitor_resource_root_explanation">CPU 数据来自独立运行的 Mihomo 进程。</string>
-    <string name="monitor_resource_source_embedded">AsteriskMETA 进程 · 内嵌</string>
+    <string name="monitor_resource_source_embedded">CzClash 进程 · 内嵌</string>
     <string name="monitor_resource_source_info">CPU 统计说明</string>
     <string name="monitor_resource_source_root">Mihomo 进程 · Root</string>
     <string name="monitor_resource_title">资源监控</string>
@@ -736,7 +736,7 @@
     <string name="settings_traffic_stats_notification_summary">在通知中显示当前速度和累计流量</string>
 
     <!-- Quick settings tile -->
-    <string name="quick_settings_tile_label">AsteriskMETA</string>
+    <string name="quick_settings_tile_label">CzClash</string>
     <string name="quick_settings_tile_processing">正在处理…</string>
     <string name="quick_settings_tile_running">代理运行中</string>
     <string name="quick_settings_tile_stopped">代理已停止</string>

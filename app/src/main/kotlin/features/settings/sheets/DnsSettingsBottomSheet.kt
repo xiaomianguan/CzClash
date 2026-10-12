@@ -3,6 +3,7 @@
 
 package features.settings.sheets
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,8 +26,7 @@ import engine.network.isCidrAddress
 import engine.network.isIpv4CidrAddress
 import engine.network.isIpAddress
 import features.settings.DnsSettingsDraft
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import ui.components.StringListEditor
 import ui.theme.AsteriskMotion
 import utils.toTrimmedNonEmptyDistinctList
@@ -327,9 +327,9 @@ private fun DnsSheetSection(
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-        Text(
+        SmartisanText(
             text = title,
-            color = MaterialTheme.colorScheme.primary,
+            color = LocalSmartisanColors.current.accent,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

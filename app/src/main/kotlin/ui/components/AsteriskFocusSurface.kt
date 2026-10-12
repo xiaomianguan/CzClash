@@ -3,6 +3,12 @@
 
 package ui.components
 
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroup
+import cc.wuersan008.smartisanx.ui.layout.SmartisanGroupRowPosition
+import cc.wuersan008.smartisanx.core.interaction.smartisanClickable
+import cc.wuersan008.smartisanx.ui.layout.SmartisanCard
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -15,16 +21,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -45,11 +47,11 @@ internal fun shouldStackPrimaryAction(
 
 @Composable
 internal fun focusAccentColor(tone: FocusTone): Color = when (tone) {
-    FocusTone.Primary -> MaterialTheme.colorScheme.primary
-    FocusTone.Inactive -> MaterialTheme.colorScheme.onSurfaceVariant
-    FocusTone.Warning -> MaterialTheme.colorScheme.tertiary
-    FocusTone.Error -> MaterialTheme.colorScheme.error
-    FocusTone.ReadOnly -> MaterialTheme.colorScheme.secondary
+    FocusTone.Primary -> LocalSmartisanColors.current.accent
+    FocusTone.Inactive -> LocalSmartisanColors.current.textSecondary
+    FocusTone.Warning -> LocalSmartisanColors.current.warning
+    FocusTone.Error -> LocalSmartisanColors.current.warning
+    FocusTone.ReadOnly -> LocalSmartisanColors.current.success
 }
 
 @Composable
@@ -61,18 +63,18 @@ private fun RowScope.FocusTitleAndSummary(
         modifier = Modifier.weight(1f),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Text(
+        SmartisanText(
             text = title,
             modifier = Modifier.semantics { heading() },
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+            style = LocalSmartisanTypography.current.title.copy(fontWeight = FontWeight.SemiBold),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         if (summary != null) {
-            Text(
+            SmartisanText(
                 text = summary,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = LocalSmartisanTypography.current.body,
+                color = LocalSmartisanColors.current.textSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -87,7 +89,7 @@ internal fun AsteriskFocusSurface(
     density: FocusDensity = FocusDensity.Medium,
     tone: FocusTone = FocusTone.Primary,
     summary: String? = null,
-    stateIcon: ImageVector? = null,
+    stateIcon: Int? = null,
     metrics: (@Composable RowScope.() -> Unit)? = null,
     primaryAction: (@Composable BoxScope.() -> Unit)? = null,
     keepPrimaryActionInline: Boolean = false,
@@ -109,16 +111,12 @@ internal fun AsteriskFocusSurface(
         FocusDensity.Compact -> 16.dp
     }
 
-    Card(
+    SmartisanGroup(
         modifier = modifier.fillMaxWidth(),
-        shape = shape,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ),
+        position = SmartisanGroupRowPosition.Single,
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 20.dp),
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -128,8 +126,8 @@ internal fun AsteriskFocusSurface(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (stateIcon != null) {
-                        Icon(
-                            imageVector = stateIcon,
+                        AsteriskIcon(
+                            res = stateIcon,
                             contentDescription = null,
                             modifier = Modifier.size(if (density == FocusDensity.Large) 32.dp else 28.dp),
                             tint = accentColor,

@@ -3,6 +3,9 @@
 
 package features.monitoring.resource
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -10,16 +13,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanDialogButton
+import ui.components.AsteriskModalDialog
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import ui.components.AsteriskLinkButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -97,16 +101,16 @@ internal fun ResourceMonitorPage(padding: PaddingValues) {
                                 onClick = { sourceInfo = source },
                                 label = resourceSourceLabel(source),
                                 trailingIcon = {
-                                    Icon(
+                                    AsteriskIcon(
                                         Icons.Rounded.Info,
                                         contentDescription = stringResource(R.string.monitor_resource_source_info),
                                     )
                                 },
                             )
-                        } ?: Text(
+                        } ?: SmartisanText(
                             text = stringResource(R.string.monitor_data_unavailable),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = LocalSmartisanTypography.current.body,
+                            color = LocalSmartisanColors.current.textSecondary,
                         )
                         ResourceChartRange.entries.forEach { option ->
                             AsteriskFilterChip(
@@ -133,21 +137,25 @@ internal fun ResourceMonitorPage(padding: PaddingValues) {
         }
     }
     sourceInfo?.let { source ->
-        AlertDialog(
+        AsteriskModalDialog(
+            title = stringResource(R.string.monitor_resource_source_info),
             onDismissRequest = { sourceInfo = null },
-            title = { Text(stringResource(R.string.monitor_resource_source_info)) },
-            text = {
-                Text(stringResource(
+            buttons = {
+                SmartisanDialogButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = { sourceInfo = null },
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                )
+            },
+        ) {
+            SmartisanText(
+                text = stringResource(
                     if (source == ProcessStatsSourceKind.CoreProcess) R.string.monitor_resource_root_explanation
                     else R.string.monitor_resource_embedded_explanation,
-                ))
-            },
-            confirmButton = {
-                TextButton(onClick = { sourceInfo = null }) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            },
-        )
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -176,8 +184,8 @@ private fun ResourceTrendCard(resource: MonitoringResourceSummary, range: Resour
     } else {
         resource.oneHourSamples
     }
-    val cpuColor = MaterialTheme.colorScheme.primary
-    val memoryColor = MaterialTheme.colorScheme.tertiary
+    val cpuColor = LocalSmartisanColors.current.accent
+    val memoryColor = LocalSmartisanColors.current.warning
     MonitoringSectionCard(stringResource(R.string.monitor_resource_trend), ResourceContentModifier) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
@@ -192,10 +200,10 @@ private fun ResourceTrendCard(resource: MonitoringResourceSummary, range: Resour
                 memoryColor = memoryColor,
             )
             if (samples.isEmpty()) {
-                Text(
+                SmartisanText(
                     stringResource(R.string.monitor_no_samples),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalSmartisanTypography.current.listItemSecondary,
+                    color = LocalSmartisanColors.current.textSecondary,
                 )
             }
         }
@@ -208,7 +216,7 @@ private fun LegendLabel(color: Color, text: String) {
         Canvas(Modifier.height(3.dp).widthIn(min = 22.dp, max = 22.dp)) {
             drawLine(color, Offset(0f, center.y), Offset(size.width, center.y), strokeWidth = size.height, cap = StrokeCap.Round)
         }
-        Text(text, style = MaterialTheme.typography.labelMedium)
+        SmartisanText(text, style = LocalSmartisanTypography.current.listItemSecondary)
     }
 }
 

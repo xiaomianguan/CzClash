@@ -3,12 +3,7 @@
 
 package ui.layout
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import ui.components.AsteriskTopAppBar
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -25,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -53,10 +47,7 @@ fun Modifier.cutoutHorizontalPadding(): Modifier {
     )
 }
 
-fun Modifier.pageScrollModifiers(
-    topAppBarScrollBehavior: TopAppBarScrollBehavior,
-): Modifier = this
-    .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
+fun Modifier.pageScrollModifiers(): Modifier = this
     .fillMaxHeight()
 
 @Composable
@@ -116,9 +107,9 @@ fun pageContentPaddingWithCutout(
 @Composable
 fun pageListPadding(
     contentPadding: PaddingValues,
-    bottomExtra: Dp = 12.dp,
+    bottomExtra: Dp = 16.dp,
     horizontalExtra: Dp = rememberPageGutter(),
-    topExtra: Dp = 8.dp,
+    topExtra: Dp = 16.dp,
 ): PaddingValues {
     val layoutDirection = LocalLayoutDirection.current
     return PaddingValues(
@@ -126,38 +117,6 @@ fun pageListPadding(
         start = contentPadding.calculateStartPadding(layoutDirection) + horizontalExtra,
         end = contentPadding.calculateEndPadding(layoutDirection) + horizontalExtra,
         bottom = contentPadding.calculateBottomPadding() + bottomExtra,
-    )
-}
-
-@Composable
-fun AdaptiveTopAppBar(
-    title: String,
-    isWideScreen: Boolean,
-    scrollBehavior: TopAppBarScrollBehavior,
-    modifier: Modifier = Modifier,
-    subtitle: String = "",
-    navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {},
-    bottomContent: @Composable () -> Unit = {},
-) {
-    AsteriskTopAppBar(
-        title = {
-            androidx.compose.foundation.layout.Column {
-                Text(title, style = MaterialTheme.typography.titleLarge)
-                if (subtitle.isNotBlank()) {
-                    Text(
-                        subtitle,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                bottomContent()
-            }
-        },
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-        navigationIcon = navigationIcon,
-        actions = actions,
     )
 }
 

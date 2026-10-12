@@ -3,8 +3,8 @@
 
 package ui.components
 
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,8 +15,8 @@ internal fun AsteriskSelectionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    selectedContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    containerColor: Color = LocalSmartisanColors.current.surface,
+    selectedContainerColor: Color = LocalSmartisanColors.current.surfaceRaised,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     AsteriskExpressiveCard(

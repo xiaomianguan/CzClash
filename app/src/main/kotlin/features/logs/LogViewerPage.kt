@@ -3,6 +3,9 @@
 
 package features.logs
 
+import ui.components.AsteriskIcon
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanTypography
+import cc.wuersan008.smartisanx.core.theme.LocalSmartisanColors
 import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.horizontalScroll
@@ -19,13 +22,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import cc.wuersan008.smartisanx.ui.basic.SmartisanText
+import cc.wuersan008.smartisanx.ui.overlay.SmartisanConfirmDialog
+import ui.components.AsteriskPopupMenu
+import ui.components.AsteriskPopupMenuItem
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIcon
+import cc.wuersan008.smartisanx.ui.basic.SmartisanIconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -159,8 +161,8 @@ private fun LogViewerPage(
                     placeholder = stringResource(R.string.common_search),
                     title = {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(
+                            SmartisanText(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            SmartisanText(
                                 text = stringResource(
                                     R.string.logs_page_subtitle,
                                     pluralStringResource(
@@ -170,52 +172,52 @@ private fun LogViewerPage(
                                     ),
                                     stringResource(if (paused) R.string.logs_paused else R.string.logs_live),
                                 ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = LocalSmartisanTypography.current.listItemSecondary,
+                                color = LocalSmartisanColors.current.textSecondary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        SmartisanIconButton(onClick = { navigator.pop() }) {
+                            AsteriskIcon(
+                                res = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = stringResource(R.string.common_back),
                             )
                         }
                     },
                     actions = {
-                        IconButton(onClick = { paused = !paused }) {
-                            Icon(
-                                imageVector = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
+                        SmartisanIconButton(onClick = { paused = !paused }) {
+                            AsteriskIcon(
+                                res = if (paused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
                                 contentDescription = stringResource(
                                     if (paused) R.string.logs_resume else R.string.logs_pause,
                                 ),
                             )
                         }
                         Box {
-                            IconButton(onClick = { menuExpanded = true }) {
-                                Icon(
-                                    imageVector = Icons.Rounded.MoreVert,
+                            SmartisanIconButton(onClick = { menuExpanded = true }) {
+                                AsteriskIcon(
+                                    res = Icons.Rounded.MoreVert,
                                     contentDescription = stringResource(R.string.home_more_actions),
                                 )
                             }
-                            DropdownMenu(
+                            AsteriskPopupMenu(
                                 expanded = menuExpanded,
                                 onDismissRequest = { menuExpanded = false },
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.logs_export)) },
-                                    leadingIcon = { Icon(Icons.Rounded.FileUpload, contentDescription = null) },
+                                AsteriskPopupMenuItem(
+                                    text = { SmartisanText(stringResource(R.string.logs_export)) },
+                                    leadingIcon = { AsteriskIcon(Icons.Rounded.FileUpload, contentDescription = null) },
                                     onClick = {
                                         menuExpanded = false
                                         export()
                                     },
                                 )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.common_clear)) },
-                                    leadingIcon = { Icon(Icons.Rounded.Clear, contentDescription = null) },
+                                AsteriskPopupMenuItem(
+                                    text = { SmartisanText(stringResource(R.string.common_clear)) },
+                                    leadingIcon = { AsteriskIcon(Icons.Rounded.Clear, contentDescription = null) },
                                     onClick = {
                                         menuExpanded = false
                                         confirmClear = true
@@ -278,30 +280,18 @@ private fun LogViewerPage(
             }
         }
         if (confirmClear) {
-            AlertDialog(
+            SmartisanConfirmDialog(
                 onDismissRequest = { confirmClear = false },
-                title = { Text(stringResource(R.string.logs_clear_title)) },
-                text = { Text(stringResource(R.string.logs_clear_message)) },
-                dismissButton = {
-                    AsteriskActionButton(
-                        text = stringResource(R.string.common_cancel),
-                        icon = Icons.Rounded.Close,
-                        onClick = { confirmClear = false },
-                    )
-                },
-                confirmButton = {
-                    AsteriskActionButton(
-                        text = stringResource(R.string.common_clear),
-                        icon = Icons.Rounded.Clear,
-                        onClick = {
-                            confirmClear = false
-                            scope.launch {
-                                onClear()
-                                repository.clear()
-                                logEntries = emptyList()
-                            }
-                        },
-                    )
+                title = stringResource(R.string.logs_clear_title),
+                message = stringResource(R.string.logs_clear_message),
+                confirmText = stringResource(R.string.common_clear),
+                dismissText = stringResource(R.string.common_cancel),
+                onConfirm = {
+                    scope.launch {
+                        onClear()
+                        repository.clear()
+                        logEntries = emptyList()
+                    }
                 },
             )
         }
